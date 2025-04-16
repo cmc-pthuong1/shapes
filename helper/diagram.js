@@ -3,5 +3,6 @@ function initDiagram(diagramId, nodeTemplate) {
     'undoManager.isEnabled': true
   });
 
-  diagram.nodeTemplate = nodeTemplate
+  diagram.nodeTemplate = nodeTemplate;
+  return diagram
 }

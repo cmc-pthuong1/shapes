@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const PORT = 3000;
+const PORT = 2020;
 // Xác định MIME types cho các loại file
 const mimeTypes = {
  '.html': 'text/html',

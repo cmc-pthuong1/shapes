@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Palette Example</title>
+    <link rel="stylesheet" href="css/palette-example.css" />
+  </head>
+  <body onload="onDomContentLoaded1()">
+    <script src="https://cdn.jsdelivr.net/npm/gojs@3.0.21/release/go.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/create-gojs-kit@3.0.21/dist/extensions/Figures.js"></script>
+    <script id="code">
+      function onDomContentLoaded1() {
+        const diagram = new go.Diagram('diagram');
+        diagram.nodeTemplate = new go.Node('Vertical')
+          .bind('location', 'loc', go.Point.parse)
+          .add(
+            new go.Shape('Circle', {
+              width: 30,
+              height: 30,
+              fill: 'white',
+              portId: '',
+              fromLinkable: true,
+              toLinkable: true
+            }),
+            new go.TextBlock('Text', {
+              margin: 5
+            }).bind('text')
+          );
+        diagram.linkTemplate = new go.Link().add(
+          new go.Shape(),
+          new go.Shape({ toArrow: 'Standard' }),
+          //   new go.TextBlock('Text').bind('text')
+          new go.Panel('Auto').add(
+            new go.Shape('RoundedRectangle', {
+              fill: 'yellow',
+              stroke: 'gray'
+            }),
+            new go.TextBlock({ margin: 3 }).bind('text')
+          )
+        );
+        const nodeDataArray = [
+          {
+            key: 'b',
+            text: 'Alpha',
+            loc: '0 0'
+          },
+          {
+            key: 'a',
+            text: 'Beta',
+            loc: '200 0'
+          },
+          {
+            key: 'c',
+            text: 'C',
+            loc: '300 50'
+          }
+        ];
+        const linkDataArray = [{ from: 'a', to: 'b', text: 'b to a' }];
+        diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+      }
+      function onDomContentLoaded2() {
+        const diagram = new go.Diagram('diagram');
+        diagram.layout = new go.LayeredDigraphLayout({
+          columnSpacing: 50,
+          setsPortSpots: false
+        });
+        diagram.nodeTemplate = new go.Node('Auto', {
+          fromSpot: go.Spot.Right,
+          toSpot: go.Spot.Left
+        })
+          .bind('location', 'loc', go.Point.parse)
+          .add(
+            new go.Shape('RoundedRectangle', {
+              fill: 'white'
+            }),
+            new go.TextBlock('Text', {
+              margin: 5
+            }).bind('text', 'key')
+          );
+        diagram.linkTemplate = new go.Link({
+          routing: go.Routing.Orthogonal, // Orthogonal routing
+          corner: 10
+        }).add(
+          new go.Shape(),
+          new go.Shape({ toArrow: 'Standard' })
+          // new go.Panel('Auto').add(
+          //   new go.Shape('RoundedRectangle', {
+          //     fill: 'yellow',
+          //     stroke: 'gray'
+          //   }),
+          //   new go.TextBlock({ margin: 3 }).bind('text')
+          // )
+        );
+        const nodeDataArray = [
+          { key: 'Alpha' },
+          { key: 'Beta' },
+          { key: 'Beta-Beta' },
+          { key: 'Gamma' },
+          { key: 'Delta' },
+          { key: 'Epsilon' },
+          { key: 'Zeta' },
+          { key: 'Eta' },
+          { key: 'Theta' }
+        ];
+        const linkDataArray = [
+          { from: 'Beta', to: 'Beta-Beta' },
+          { from: 'Gamma', to: 'Alpha' },
+          { from: 'Delta', to: 'Alpha' },
+          { from: 'Alpha', to: 'Epsilon' },
+          { from: 'Alpha', to: 'Zeta' },
+          { from: 'Alpha', to: 'Eta' },
+          { from: 'Alpha', to: 'Theta' }
+        ];
+        diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+      }
+    </script>
+    <div>
+      <div class="diagram" id="diagram"></div>
+    </div>
+  </body>
+</html>

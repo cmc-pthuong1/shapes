@@ -5,25 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Example</title>
     <link rel="stylesheet" href="css/example.css" />
-    <!-- <style>
-      body {
-        height: 100%;
-        width: 100%;
-        background-color: lightgray;
-      }
-    </style> -->
   </head>
   <body onload="onDomContentLoaded()">
     <script src="https://cdn.jsdelivr.net/npm/gojs@3.0.21/release/go.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/create-gojs-kit@3.0.21/dist/extensions/Figures.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/create-gojs-kit@3.0.21/dist/extensions/DataInspector.js"></script>
 
     <script src="helper/palette.js"></script>
     <script src="helper/diagram.js"></script>
     <script src="helper/nodeTemplate.js"></script>
+    <script src="helper/inspector.js"></script>
     <script id="code">
       function onDomContentLoaded() {
+        var diagram = initDiagram('diagram', nodeTemplate);
         initPalette('palette', nodeTemplate);
-        initDiagram('diagram', nodeTemplate);
+        initInspector({
+          diagram,
+          textId: 'inspectorText',
+          colorId: 'inspectorColor',
+          inspectorId: 'inspector'
+        });
       }
     </script>
     <div class="app">
@@ -34,6 +35,16 @@
       <div class="diagram" id="diagram"></div>
       <div class="inspector">
         <h1 class="title">Style</h1>
+        <div id="inspector" style="display: none">
+          <div>
+            <label>Text:</label>
+            <input type="text" id="inspectorText" oninput="" />
+          </div>
+          <div>
+            <label>Color:</label>
+            <input type="color" id="inspectorColor" />
+          </div>
+        </div>
       </div>
     </div>
   </body>

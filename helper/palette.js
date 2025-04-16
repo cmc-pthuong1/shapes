@@ -19,10 +19,10 @@ function initPalette(paletteId, nodeTemplate) {
 
   // now add the initial contents of the Palette
   palette.model.nodeDataArray = [
-    { text: 'Text', color: 'blue', figure: 'Circle' },
-    { text: 'Text', color: 'purple', figure: 'Square' },
-    { text: 'Text', color: 'orange', figure: 'Ellipse' },
-    { text: 'Text', color: 'red', figure: 'Rectangle' },
+    { text: 'Text', color: '#38bdf8', figure: 'Circle' },
+    { text: 'Text', color: '#a78bfa', figure: 'Square' },
+    { text: 'Text', color: '#fde047', figure: 'Ellipse' },
+    { text: 'Text', color: '#78716c', figure: 'Rectangle' },
     // { text: 'Text', color: 'green', figure: 'RoundedRectangle' },
     // { text: 'Text', color: 'purple', figure: 'Triangle' }
   ];
