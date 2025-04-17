@@ -70,3 +70,5 @@ const nodeDataArray = [
   }
   // { text: 'Text', color: 'purple', figure: 'Triangle' }
 ];
+
+const links = [{ key: 'linkTemplate', category: 'LinkNode', type: 'link' }]; 

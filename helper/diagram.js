@@ -4,5 +4,9 @@ function initDiagram(diagramId, nodeTemplate) {
   });
 
   diagram.nodeTemplate = nodeTemplate;
-  return diagram
+  diagram.linkTemplate = new go.Link().add(
+    new go.Shape(),
+    new go.Shape({ toArrow: 'Standard' })
+  );
+  return diagram;
 }
