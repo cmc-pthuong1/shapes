@@ -16,9 +16,10 @@ const nodeTemplate = new go.Node('Auto', { locationSpot: go.Spot.Left })
       .bind('strokeWidth')
       .bind('stroke')
       .bind('fill')
-      .bind('figure'),
+      .bind('figure')
+      .bind('width')
+      .bind('height'),
     new go.TextBlock({
-      margin: new go.Margin(5, 5, 3, 5),
       font: '10pt sans-serif',
       textAlign: 'center'
       //   editable: true
@@ -34,7 +35,9 @@ const nodeDataArray = [
     stroke: '#38bdf8',
     figure: 'Circle',
     fill: '#ffffff',
-    strokeWidth: 2
+    strokeWidth: 2,
+    width: 40,
+    height: 40
   },
   {
     text: 'Text',
@@ -42,7 +45,9 @@ const nodeDataArray = [
     stroke: '#a78bfa',
     figure: 'Square',
     fill: '#ffffff',
-    strokeWidth: 2
+    strokeWidth: 2,
+    width: 40,
+    height: 40
   },
   {
     text: 'Text',
@@ -50,7 +55,9 @@ const nodeDataArray = [
     stroke: '#fde047',
     figure: 'Ellipse',
     fill: '#ffffff',
-    strokeWidth: 2
+    strokeWidth: 2,
+    width: 50,
+    height: 30
   },
   {
     text: 'Text',
@@ -58,7 +65,9 @@ const nodeDataArray = [
     stroke: '#78716c',
     figure: 'Rectangle',
     fill: '#ffffff',
-    strokeWidth: 2
+    strokeWidth: 2,
+    width: 40,
+    height: 30
   },
   {
     text: 'Text',
@@ -66,7 +75,9 @@ const nodeDataArray = [
     stroke: '#22c55e',
     figure: 'RoundedRectangle',
     fill: '#ffffff',
-    strokeWidth: 2
+    strokeWidth: 2,
+    width: 40,
+    height: 30
   }
   // { text: 'Text', color: 'purple', figure: 'Triangle' }
 ];

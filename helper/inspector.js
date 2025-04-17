@@ -6,7 +6,9 @@ function initInspector({
   fillId = 'inspectorFill',
   XId = 'inspectorX',
   YId = 'inspectorY',
-  strokeWidthId = 'inspectorStrokeWidth'
+  strokeWidthId = 'inspectorStrokeWidth',
+  heightId = 'inspectorHeight',
+  widthId = 'inspectorWidth'
 }) {
   diagram.addDiagramListener('ChangedSelection', function () {
     const selected = diagram.selection.first();
@@ -23,6 +25,8 @@ function initInspector({
       setDataToValue(XId, locationX, '0');
       setDataToValue(YId, locationY, '0');
       setDataToValue(strokeWidthId, selected.data.strokeWidth, 2);
+      setDataToValue(heightId, selected.data.height, 40);
+      setDataToValue(widthId, selected.data.width, 40);
     } else {
       inspector.style.display = 'none';
     }
@@ -30,8 +34,10 @@ function initInspector({
   onChangeDataProperty(textId, 'text', diagram);
   onChangeDataProperty(colorId, 'color', diagram);
   onChangeDataProperty(fillId, 'fill', diagram);
-  onChangeDataProperty(strokeWidthId, 'strokeWidth', diagram);
+  onChangeNumberProperty(strokeWidthId, 'strokeWidth', diagram);
   onChangeLocation(XId, YId, diagram);
+  onChangeNumberProperty(widthId, 'width', diagram);
+  onChangeNumberProperty(heightId, 'height', diagram);
 }
 
 function setDataToValue(id, newValue, defaultValue) {
@@ -44,6 +50,16 @@ function onChangeDataProperty(id, name, diagram) {
     if (node instanceof go.Node) {
       diagram.model.startTransaction(`update ${name}`);
       diagram.model.setDataProperty(node.data, name, this.value);
+      diagram.model.commitTransaction(`update ${name}`);
+    }
+  });
+}
+function onChangeNumberProperty(id, name, diagram) {
+  document.getElementById(id).addEventListener('change', function () {
+    const node = diagram.selection.first();
+    if (node instanceof go.Node) {
+      diagram.model.startTransaction(`update ${name}`);
+      diagram.model.setDataProperty(node.data, name, Number(this.value));
       diagram.model.commitTransaction(`update ${name}`);
     }
   });
