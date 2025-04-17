@@ -2,34 +2,76 @@ function initInspector({
   diagram,
   textId = 'inspectorText',
   colorId = 'inspectorColor',
-  inspectorId = 'inspector'
+  inspectorId = 'inspector',
+  fillId = 'inspectorFill',
+  XId = 'inspectorX',
+  YId = 'inspectorY',
+  strokeWidthId = 'inspectorStrokeWidth'
 }) {
   diagram.addDiagramListener('ChangedSelection', function () {
     const selected = diagram.selection.first();
     const inspector = document.getElementById(inspectorId);
-    console.log(selected.data);
     if (selected instanceof go.Node) {
+      console.log(selected.data);
       inspector.style.display = 'block';
-      document.getElementById(textId).value = selected.data.text || '';
-      document.getElementById(colorId).value = selected.data.color || '#ffffff';
+      const location = selected.data.location.split(' ');
+      const locationX = location[0];
+      const locationY = location[1];
+      setDataToValue(textId, selected.data.text, '');
+      setDataToValue(colorId, selected.data.color, '#ffffff');
+      setDataToValue(fillId, selected.data.fill, '#ffffff');
+      setDataToValue(XId, locationX, '0');
+      setDataToValue(YId, locationY, '0');
+      setDataToValue(strokeWidthId, selected.data.strokeWidth, 2);
     } else {
       inspector.style.display = 'none';
     }
   });
-  document.getElementById(textId).addEventListener('input', function () {
+  onChangeDataProperty(textId, 'text', diagram);
+  onChangeDataProperty(colorId, 'color', diagram);
+  onChangeDataProperty(fillId, 'fill', diagram);
+  onChangeDataProperty(strokeWidthId, 'strokeWidth', diagram);
+  onChangeLocation(XId, YId, diagram);
+}
+
+function setDataToValue(id, newValue, defaultValue) {
+  document.getElementById(id).value = newValue || defaultValue;
+}
+
+function onChangeDataProperty(id, name, diagram) {
+  document.getElementById(id).addEventListener('change', function () {
     const node = diagram.selection.first();
     if (node instanceof go.Node) {
-      diagram.model.startTransaction('update text');
-      diagram.model.setDataProperty(node.data, 'text', this.value);
-      diagram.model.commitTransaction('update text');
+      diagram.model.startTransaction(`update ${name}`);
+      diagram.model.setDataProperty(node.data, name, this.value);
+      diagram.model.commitTransaction(`update ${name}`);
     }
   });
-  document.getElementById(colorId).addEventListener('input', function () {
+}
+
+function onChangeLocation(XId, YId, diagram) {
+  document.getElementById(XId).addEventListener('change', function () {
     const node = diagram.selection.first();
+    const location = node.data.location.split(' ');
+    const locationX = this.value;
+    const locationY = location[1];
+    const newLocation = [locationX, locationY].join(' ');
     if (node instanceof go.Node) {
-      diagram.model.startTransaction('update color');
-      diagram.model.setDataProperty(node.data, 'color', this.value);
-      diagram.model.commitTransaction('update color');
+      diagram.model.startTransaction('update location');
+      diagram.model.setDataProperty(node.data, 'location', newLocation);
+      diagram.model.commitTransaction('update location');
+    }
+  });
+  document.getElementById(YId).addEventListener('change', function () {
+    const node = diagram.selection.first();
+    const location = node.data.location.split(' ');
+    const locationX = location[0];
+    const locationY = this.value;
+    const newLocation = [locationX, locationY].join(' ');
+    if (node instanceof go.Node) {
+      diagram.model.startTransaction('update location');
+      diagram.model.setDataProperty(node.data, 'location', newLocation);
+      diagram.model.commitTransaction('update location');
     }
   });
 }
