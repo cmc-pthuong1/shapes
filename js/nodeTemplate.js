@@ -79,5 +79,4 @@ const nodeDataArray = [
     width: 40,
     height: 30
   }
-  // { text: 'Text', color: 'purple', figure: 'Triangle' }
 ];
