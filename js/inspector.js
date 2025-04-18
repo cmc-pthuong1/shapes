@@ -9,17 +9,11 @@ const nodeDataKeys = {
   height: 'height',
   locationX: 'locationX',
   locationY: 'locationY'
-}
+};
 
-const numberKeys = [
-  'strokeWidth',
-  'width',
-  'height'
-]
+const numberKeys = ['strokeWidth', 'width', 'height'];
 
-const locationKeys = [
-  'locationX',
-  'locationY']
+const locationKeys = ['locationX', 'locationY'];
 
 function initInspector({
   diagram,
@@ -54,34 +48,71 @@ function initInspector({
       inspector.style.display = 'none';
     }
   });
+  const bindingTwoWayMap = [
+    {
+      key: 'height',
+      id: heightId,
+      default: 40
+    },
+    {
+      key: 'width',
+      id: widthId,
+      default: 40
+    }
+  ];
+  diagram.addModelChangedListener((evt) => {
+    // ignore unimportant Transaction events
+    if (!evt.isTransactionFinished) return;
+    const txn = evt.object; // a Transaction
+    console.log('🚀 ~ txn:', txn);
+
+    if (txn === null) return;
+
+    // iterate over all of the actual ChangedEvents of the Transaction
+    txn.changes.each((e) => {
+
+      // ignore any kind of change other than adding/removing a node
+      const property = bindingTwoWayMap.find(
+        (item) => item.key == e.propertyName
+      );
+      if (property) {
+        setDataToValue(property.id, e.newValue, property.default);
+      }
+
+      // record node insertions and removals
+      if (e.change === go.ChangeType.Insert) {
+        console.log(
+          evt.propertyName + ' added node with key: ' + e.newValue.key
+        );
+      } else if (e.change === go.ChangeType.Remove) {
+        console.log(
+          evt.propertyName + ' removed node with key: ' + e.oldValue.key
+        );
+      }
+    });
+  });
 }
 
 function setDataToValue(id, newValue, defaultValue) {
   document.getElementById(id).value = newValue || defaultValue;
 }
 
-function onChangeDataProperty(
-  event, name, diagram
-) {
-  const value = event.target.value
+function onChangeDataProperty(event, name, diagram) {
+  const value = event.target.value;
 
   if (numberKeys.includes(name)) {
-    onChangeProperty(Number(value), name, diagram)
-    return
+    onChangeProperty(Number(value), name, diagram);
+    return;
   }
   if (locationKeys.includes(name)) {
-    onChangeLocation(value, name, diagram)
-    return
+    onChangeLocation(value, name, diagram);
+    return;
   }
 
-  onChangeProperty(value, name, diagram)
-
+  onChangeProperty(value, name, diagram);
 }
 
-function onChangeProperty(
-  value, name, diagram
-) {
-
+function onChangeProperty(value, name, diagram) {
   const node = diagram.selection.first();
   if (node instanceof go.Node) {
     diagram.model.startTransaction(`update ${name}`);
@@ -104,5 +135,4 @@ function onChangeLocation(value, name, diagram) {
     diagram.model.setDataProperty(node.data, 'location', newLocation);
     diagram.model.commitTransaction('update location');
   }
-
 }
