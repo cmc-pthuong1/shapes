@@ -1,8 +1,12 @@
-const nodeTemplate = new go.Node('Auto', { locationSpot: go.Spot.Left })
+const nodeTemplate = new go.Node('Auto', {
+  locationSpot: go.Spot.Left,
+  resizable: true,
+  resizeObjectName: 'MAIN'
+})
   .bind('location', 'location', go.Point.parse, go.Point.stringify)
   .add(
     new go.Shape('Circle', {
-      // fill: 'white',
+      name: 'MAIN',
       stroke: 'gray',
       strokeWidth: 2,
       portId: '',
@@ -17,8 +21,8 @@ const nodeTemplate = new go.Node('Auto', { locationSpot: go.Spot.Left })
       .bind('stroke')
       .bind('fill')
       .bind('figure')
-      .bind('width')
-      .bind('height'),
+      .bindTwoWay('width')
+      .bindTwoWay('height'),
     new go.TextBlock({
       font: '10pt sans-serif',
       textAlign: 'center'
