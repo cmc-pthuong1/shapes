@@ -91,17 +91,6 @@ function onModelChange({
       if (property) {
         setDataToValue(property.id, e.newValue, property.default);
       }
-
-      // record node insertions and removals
-      if (e.change === go.ChangeType.Insert) {
-        console.log(
-          evt.propertyName + ' added node with key: ' + e.newValue.key
-        );
-      } else if (e.change === go.ChangeType.Remove) {
-        console.log(
-          evt.propertyName + ' removed node with key: ' + e.oldValue.key
-        );
-      }
     });
   });
 }
