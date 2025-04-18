@@ -8,7 +8,8 @@ const nodeDataKeys = {
   width: 'width',
   height: 'height',
   locationX: 'locationX',
-  locationY: 'locationY'
+  locationY: 'locationY',
+  textAlign: 'textAlign'
 };
 
 const numberKeys = ['strokeWidth', 'width', 'height'];
@@ -48,6 +49,18 @@ function initInspector({
       inspector.style.display = 'none';
     }
   });
+  onModelChange({
+    diagram,
+    heightId,
+    widthId
+  });
+}
+
+function onModelChange({
+  diagram,
+  heightId = 'inspectorHeight',
+  widthId = 'inspectorWidth'
+}) {
   const bindingTwoWayMap = [
     {
       key: 'height',
@@ -60,6 +73,7 @@ function initInspector({
       default: 40
     }
   ];
+
   diagram.addModelChangedListener((evt) => {
     // ignore unimportant Transaction events
     if (!evt.isTransactionFinished) return;
@@ -70,7 +84,6 @@ function initInspector({
 
     // iterate over all of the actual ChangedEvents of the Transaction
     txn.changes.each((e) => {
-
       // ignore any kind of change other than adding/removing a node
       const property = bindingTwoWayMap.find(
         (item) => item.key == e.propertyName
@@ -135,4 +148,15 @@ function onChangeLocation(value, name, diagram) {
     diagram.model.setDataProperty(node.data, 'location', newLocation);
     diagram.model.commitTransaction('update location');
   }
+}
+
+function onChangeAlignmentProperty(event, name, diagram) {
+  const value = event.target.value;
+  let align = go.Spot.Center;
+  if (value == 'left') {
+    align = go.Spot.Left;
+  } else if (value == 'right') {
+    align = go.Spot.Right;
+  }
+  onChangeProperty(align, name, diagram);
 }

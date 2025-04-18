@@ -25,11 +25,11 @@ const nodeTemplate = new go.Node('Auto', {
       .bindTwoWay('height'),
     new go.TextBlock({
       font: '10pt sans-serif',
-      textAlign: 'center'
-      //   editable: true
+      // alignment: go.Spot.Left
     })
       .bind('text')
       .bind('stroke', 'color')
+      .bind('alignment', 'textAlign')
   );
 
 const nodeDataArray = [
@@ -41,7 +41,8 @@ const nodeDataArray = [
     fill: '#ffffff',
     strokeWidth: 2,
     width: 40,
-    height: 40
+    height: 40,
+    textAlign: go.Spot.Center
   },
   {
     text: 'Text',
@@ -51,7 +52,8 @@ const nodeDataArray = [
     fill: '#ffffff',
     strokeWidth: 2,
     width: 40,
-    height: 40
+    height: 40,
+    textAlign: go.Spot.Center
   },
   {
     text: 'Text',
@@ -61,7 +63,8 @@ const nodeDataArray = [
     fill: '#ffffff',
     strokeWidth: 2,
     width: 50,
-    height: 30
+    height: 30,
+    textAlign: go.Spot.Center
   },
   {
     text: 'Text',
@@ -71,7 +74,8 @@ const nodeDataArray = [
     fill: '#ffffff',
     strokeWidth: 2,
     width: 40,
-    height: 30
+    height: 30,
+    textAlign: go.Spot.Center
   },
   {
     text: 'Text',
@@ -81,6 +85,7 @@ const nodeDataArray = [
     fill: '#ffffff',
     strokeWidth: 2,
     width: 40,
-    height: 30
+    height: 30,
+    textAlign: go.Spot.Center
   }
 ];
