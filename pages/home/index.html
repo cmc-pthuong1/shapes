@@ -11,18 +11,14 @@
     <script src="https://cdn.jsdelivr.net/npm/gojs@3.0.21/release/go.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/create-gojs-kit@3.0.21/dist/extensions/Figures.js"></script>
     <script type="module" src="home.js"></script>
-    <script src="../../modules/inspector.js"></script>
+    <script src="../../core/utils/inspector.js"></script>
     <script type="module">
       import { onHomeContentLoaded } from "./home.js";
       import {
-        onChangeAlignmentProperty,
-        onChangeDataProperty,
         nodeDataKeys,
-      } from "../../modules/inspector.js";
+      } from "../../core/constants.js";
 
       window.onHomeContentLoaded = onHomeContentLoaded;
-      window.onChangeAlignmentProperty = onChangeAlignmentProperty;
-      window.onChangeDataProperty = onChangeDataProperty;
       window.nodeDataKeys = nodeDataKeys;
     </script>
     <script id="code">
