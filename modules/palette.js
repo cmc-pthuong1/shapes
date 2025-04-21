@@ -1,5 +1,5 @@
-function initPalette(paletteId, nodeTemplate) {
-  palette = new go.Palette(paletteId, {
+export function initPalette(paletteId, nodeTemplate, nodeDataArray) {
+  let palette = new go.Palette(paletteId, {
     allowZoom: false,
     nodeTemplate: nodeTemplate,
     contentAlignment: go.Spot.Center,
@@ -11,4 +11,5 @@ function initPalette(paletteId, nodeTemplate) {
   });
 
   palette.model.nodeDataArray = nodeDataArray;
+  return palette
 }

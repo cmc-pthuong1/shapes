@@ -1,5 +1,5 @@
-function initDiagram(diagramId, nodeTemplate) {
-  diagram = new go.Diagram(diagramId, {
+export function initDiagram(diagramId, nodeTemplate) {
+  let diagram = new go.Diagram(diagramId, {
     'undoManager.isEnabled': true
   });
 

@@ -1,4 +1,4 @@
-const nodeDataKeys = {
+export const nodeDataKeys = {
   text: 'text',
   color: 'color',
   stroke: 'stroke',
@@ -16,7 +16,7 @@ const numberKeys = ['strokeWidth', 'width', 'height'];
 
 const locationKeys = ['locationX', 'locationY'];
 
-function initInspector({
+export function initInspector({
   diagram,
   textId = 'inspectorText',
   colorId = 'inspectorColor',
@@ -99,7 +99,7 @@ function setDataToValue(id, newValue, defaultValue) {
   document.getElementById(id).value = newValue || defaultValue;
 }
 
-function onChangeDataProperty(event, name, diagram) {
+export function onChangeDataProperty(event, name, diagram) {
   const value = event.target.value;
 
   if (numberKeys.includes(name)) {
@@ -139,7 +139,7 @@ function onChangeLocation(value, name, diagram) {
   }
 }
 
-function onChangeAlignmentProperty(event, name, diagram) {
+export function onChangeAlignmentProperty(event, name, diagram) {
   const value = event.target.value;
   let align = go.Spot.Center;
   if (value == 'left') {
