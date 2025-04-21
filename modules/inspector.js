@@ -1,84 +1,56 @@
 
-export function initInspector({
-  diagram,
-  textId = 'inspectorText',
-  colorId = 'inspectorColor',
-  inspectorId = 'inspector',
-  fillId = 'inspectorFill',
-  XId = 'inspectorX',
-  YId = 'inspectorY',
-  strokeWidthId = 'inspectorStrokeWidth',
-  heightId = 'inspectorHeight',
-  widthId = 'inspectorWidth'
-}) {
-  diagram.addDiagramListener('ChangedSelection', function () {
-    const selected = diagram.selection.first();
-    const inspector = document.getElementById(inspectorId);
-    if (selected instanceof go.Node) {
-      console.log(selected.data);
-      inspector.style.display = 'block';
-      const location = selected.data.location.split(' ');
-      const locationX = location[0];
-      const locationY = location[1];
-      setDataToValue(textId, selected.data.text, '');
-      setDataToValue(colorId, selected.data.color, '#ffffff');
-      setDataToValue(fillId, selected.data.fill, '#ffffff');
-      setDataToValue(XId, locationX, '0');
-      setDataToValue(YId, locationY, '0');
-      setDataToValue(strokeWidthId, selected.data.strokeWidth, 2);
-      setDataToValue(heightId, selected.data.height, 40);
-      setDataToValue(widthId, selected.data.width, 40);
-    } else {
-      inspector.style.display = 'none';
+import { inspectorInputs, nodeDataKeys } from "../core/constants.js";
+import { onChangeDataProperty, onChangeAlignmentProperty, onModelChange, convertAlignmentToValue } from "../core/utils/inspector.js";
+
+export function initInspector(id, diagram) {
+  const container = document.getElementById(id);
+  diagram.addDiagramListener("ChangedSelection", () => {
+    container.innerHTML = "";
+    const part = diagram.selection.first();
+    if (part instanceof go.Node) {
+      const data = part.data;
+      console.log("data", data);
+
+      for (let property of inspectorInputs) {
+        const wrap = document.createElement('div');
+        wrap.style.display = 'flex';
+        wrap.style.alignItems = 'center';
+        wrap.style.columnGap = '10px';
+        const { key, default: defaultValue, type, options, label: labelText } = property;
+        const label = document.createElement('label');
+        label.textContent = labelText;
+        wrap.appendChild(label);
+
+        if (type == 'select') {
+          const select = document.createElement('select');
+          options.forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option.value;
+            opt.textContent = option.label;
+            select.appendChild(opt);
+          });
+          select.name = key;
+          select.id = key;
+          select.value = convertAlignmentToValue(data[key]);
+          select.onchange = (event) => onChangeAlignmentProperty(event, key, diagram);
+          wrap.appendChild(select);
+        } else {
+          const input = document.createElement('input');
+          input.type = type;
+          input.name = key;
+          input.id = key;
+          input.value = data[key] || defaultValue;
+          input.onchange = (event) => onChangeDataProperty(event, key, type, diagram);
+          wrap.appendChild(input);
+        }
+        container.appendChild(wrap);
+
+      }
     }
   });
   onModelChange({
     diagram,
-    heightId,
-    widthId
+    heightId: nodeDataKeys.height,
+    widthId: nodeDataKeys.width
   });
 }
-
-function onModelChange({
-  diagram,
-  heightId = 'inspectorHeight',
-  widthId = 'inspectorWidth'
-}) {
-  const bindingTwoWayMap = [
-    {
-      key: 'height',
-      id: heightId,
-      default: 40
-    },
-    {
-      key: 'width',
-      id: widthId,
-      default: 40
-    }
-  ];
-
-  diagram.addModelChangedListener((evt) => {
-    // ignore unimportant Transaction events
-    if (!evt.isTransactionFinished) return;
-    const txn = evt.object; // a Transaction
-    console.log('🚀 ~ txn:', txn);
-
-    if (txn === null) return;
-
-    // iterate over all of the actual ChangedEvents of the Transaction
-    txn.changes.each((e) => {
-      // ignore any kind of change other than adding/removing a node
-      const property = bindingTwoWayMap.find(
-        (item) => item.key == e.propertyName
-      );
-      if (property) {
-        setDataToValue(property.id, e.newValue, property.default);
-      }
-    });
-  });
-}
-
-function setDataToValue(id, newValue, defaultValue) {
-  document.getElementById(id).value = newValue || defaultValue;
-}
-
