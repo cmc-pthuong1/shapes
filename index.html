@@ -4,29 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Example</title>
-    <link rel="stylesheet" href="css/example.css" />
+    <link rel="stylesheet" href="styles/app.css" />
   </head>
 
-  <body onload="onDomContentLoaded()">
+  <body>
     <script src="https://cdn.jsdelivr.net/npm/gojs@3.0.21/release/go.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/create-gojs-kit@3.0.21/dist/extensions/Figures.js"></script>
 
-    <script src="js/palette.js"></script>
-    <script src="js/diagram.js"></script>
-    <script src="js/nodeTemplate.js"></script>
-    <script src="js/inspector.js"></script>
-    <script id="code">
-      function onDomContentLoaded() {
-        var diagram = initDiagram('diagram', nodeTemplate);
-        initPalette('palette', nodeTemplate);
-        initInspector({
-          diagram,
-          textId: 'inspectorText',
-          colorId: 'inspectorColor',
-          inspectorId: 'inspector'
-        });
-      }
-    </script>
     <div class="app">
       <div class="palette">
         <h1 class="title">Shapes</h1>
@@ -35,96 +19,9 @@
       <div class="diagram" id="diagram"></div>
       <div class="inspector">
         <h1 class="title">Style</h1>
-        <div id="inspector" style="display: none">
-          <div>
-            <label>Text:</label>
-            <input
-              type="text"
-              id="inspectorText"
-              onchange="onChangeDataProperty(event, nodeDataKeys.text, diagram)"
-            />
-          </div>
-          <div>
-            <label>Text:</label>
-            <div>
-              <button
-                onclick="onChangeAlignmentProperty(event, nodeDataKeys.textAlign, diagram)"
-                value="left"
-              >
-                left
-              </button>
-              <button
-                onclick="onChangeAlignmentProperty(event, nodeDataKeys.textAlign, diagram)"
-                value="center"
-              >
-                center
-              </button>
-              <button
-                onclick="onChangeAlignmentProperty(event, nodeDataKeys.textAlign, diagram)"
-                value="right"
-              >
-                right
-              </button>
-            </div>
-          </div>
-          <div>
-            <label>Color:</label>
-            <input
-              type="color"
-              id="inspectorColor"
-              onchange="onChangeDataProperty(event, nodeDataKeys.color, diagram)"
-            />
-          </div>
-          <div>
-            <label>Fill:</label>
-            <input
-              type="color"
-              id="inspectorFill"
-              onchange="onChangeDataProperty(event, nodeDataKeys.fill, diagram)"
-            />
-          </div>
-          <div>
-            <label>X:</label>
-            <input
-              type="number"
-              id="inspectorX"
-              onchange="onChangeDataProperty(event, nodeDataKeys.locationX, diagram)"
-            />
-          </div>
-          <div>
-            <label>y:</label>
-            <input
-              type="number"
-              id="inspectorY"
-              onchange="onChangeDataProperty(event, nodeDataKeys.locationY, diagram)"
-            />
-          </div>
-          <div>
-            <label>Stroke width:</label>
-            <input
-              type="number"
-              id="inspectorStrokeWidth"
-              onchange="onChangeDataProperty(event, nodeDataKeys.strokeWidth, diagram)"
-            />
-          </div>
-          <div>
-            <label>Width:</label>
-            <input
-              type="number"
-              id="inspectorWidth"
-              onchange="onChangeDataProperty(event, nodeDataKeys.width, diagram)"
-            />
-          </div>
-          <div>
-            <label>Height:</label>
-            <input
-              type="number"
-              id="inspectorHeight"
-              onchange="onChangeDataProperty(event, nodeDataKeys.height, diagram)"
-            />
-          </div>
-        </div>
+        <div id="inspector" class="inspector"></div>
       </div>
     </div>
+    <script type="module" src="app.js"></script>
   </body>
 </html>
