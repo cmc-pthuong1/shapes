@@ -1,0 +1,14 @@
+.app {
+  height: calc(100% - 40px);
+}
+.sheets {
+  height: 40px;
+  background-color: white;
+  display: flex;
+
+}
+button {
+    border-left: none;
+    background-color: white;
+    height:100%;
+}
