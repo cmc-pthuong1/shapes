@@ -39,7 +39,7 @@ export class ImageInserter {
     };
     //thêm node
     this.diagram.model.addNodeData(newNodeData);
-    this.diagram.model.updateTargetBindings(newNodeData);
+    // this.diagram.model.updateTargetBindings(newNodeData);
     //clear input
     if (this.input) {
       this.input.value = "";
