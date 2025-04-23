@@ -14,6 +14,19 @@ export function convertImageToBase64(file) {
   });
 }
 
+export function convertBlobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result);
+    };
+    reader.onerror = () => {
+      reject(new Error("Error reading blob"));
+    };
+    reader.readAsDataURL(blob);
+  });
+}
+
 export function getDimensionImage(src) {
   return new Promise((resolve, reject) => {
     const img = new Image();

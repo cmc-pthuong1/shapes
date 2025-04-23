@@ -1,4 +1,5 @@
 import {
+  convertBlobToBase64,
   convertImageToBase64,
   getDimensionImage,
 } from "../core/utils/common.js";
@@ -51,20 +52,16 @@ export class ImageInserter {
   }
 
   onDocumentPasteImage() {
-    const _ = this
+    // const _ = this;
     document.addEventListener("paste", async (event) => {
       const items = (event.clipboardData || window.clipboardData).items;
       if (!items) return;
       for (let item of items) {
         if (item.type.indexOf("image") === 0) {
           const blob = item.getAsFile();
-          const reader = new FileReader();
-          reader.onload = async function (e) {
-            const base64 = e.target.result;
-            const imageInfo = await getDimensionImage(base64);
-            _.insertImage(imageInfo);
-          };
-          reader.readAsDataURL(blob);
+          const base64 = await convertBlobToBase64(blob);
+          const imageInfo = await getDimensionImage(base64);
+          this.insertImage(imageInfo);
           break; // Dán một ảnh mỗi lần
         }
       }
