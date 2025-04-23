@@ -12,9 +12,10 @@ export class Palette {
   initPalette() {
     if (!this.paletteContainer) return;
     this.palette = new go.Palette(this.paletteDivId, {
+      "animationManager.isEnabled": false,
       allowZoom: false,
       nodeTemplate: this.nodeTemplate,
-      contentAlignment: go.Spot.Center,
+      contentAlignment: go.Spot.Left,
       layout: new go.GridLayout({
         wrappingColumn: 4,
         cellSize: new go.Size(2, 2),

@@ -9,7 +9,7 @@ locationBinding.makeTwoWay((point, data) => {
   return data;
 });
 export const nodeTemplate = new go.Node("Auto", {
-  locationSpot: go.Spot.Left,
+  locationSpot: go.Spot.Center,
   resizable: true,
   resizeObjectName: "MAIN",
 })
@@ -42,9 +42,10 @@ export const nodeTemplate = new go.Node("Auto", {
       .bind("alignment", "textAlign")
   );
 export const ImageTemplate = new go.Node("Auto", {
-  locationSpot: go.Spot.Left,
+  locationSpot: go.Spot.Center,
   resizable: true,
   resizeObjectName: "P",
+  rotatable: true,
 })
   .bindTwoWay(locationBinding)
   .add(
