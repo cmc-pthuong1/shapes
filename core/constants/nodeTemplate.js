@@ -12,6 +12,7 @@ export const nodeTemplate = new go.Node("Auto", {
   locationSpot: go.Spot.Center,
   resizable: true,
   resizeObjectName: "MAIN",
+  selectionAdorned: false,
 })
   .bindTwoWay(locationBinding)
   .add(
@@ -46,6 +47,8 @@ export const ImageTemplate = new go.Node("Auto", {
   resizable: true,
   resizeObjectName: "P",
   rotatable: true,
+  selectionAdorned: false, // không hiện khung xanh bao quanh node khi chọn node
+  rotateObjectName: "P",
 })
   .bindTwoWay(locationBinding)
   .add(
@@ -62,3 +65,8 @@ export const ImageTemplate = new go.Node("Auto", {
       .bindTwoWay("width")
       .bindTwoWay("height")
   );
+
+export const linkTemplate = new go.Link({
+  relinkableFrom: true,
+  relinkableTo: true,
+}).add(new go.Shape(), new go.Shape({ toArrow: "Standard" }));

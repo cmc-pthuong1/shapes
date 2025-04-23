@@ -19,6 +19,14 @@ export class Diagram {
 
     this.diagram.nodeTemplate = this.nodeTemplate;
     this.diagram.nodeTemplateMap.add("ImageNode", ImageTemplate);
+    //change position of rotate tool from right to top of node
+    this.diagram.toolManager.rotatingTool.handleAngle = 270;
+    //RelinkingTool
+    this.diagram.linkTemplate = new go.Link({
+      // reshapable: true,
+      relinkableFrom: true,
+      relinkableTo: true,
+    }).add(new go.Shape(), new go.Shape({ toArrow: "Standard" }));
 
     if (this.jsonModel) {
       this.diagram.model = go.Model.fromJson(this.jsonModel);
