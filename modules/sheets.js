@@ -80,8 +80,9 @@ export class Sheet {
       diagram: this.diagram,
       imageInserterDivId: "imageInserter",
     });
-    
+    // bật chức năng insert ảnh
     imageInserter.initUI()
+    imageInserter.onDocumentPasteImage()
 
     this.highlightActiveSheet(sheetName);
   }
