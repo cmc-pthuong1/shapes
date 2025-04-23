@@ -74,7 +74,7 @@ export class ImageInserter {
       const items = (event.clipboardData || window.clipboardData).items;
       if (!items) return;
       for (let item of items) {
-        if (item.type.indexOf("image") === 0) {
+        if (item.type.startsWith("image/")) {
           const blob = item.getAsFile();
           const base64 = await convertBlobToBase64(blob);
           const imageInfo = await getDimensionImage(base64);
