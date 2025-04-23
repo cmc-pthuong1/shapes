@@ -1,19 +1,17 @@
 import {
+  inspectorImageInputs,
+  nodeDataKeys,
+  inspectorInputs,
+} from "../core/constants/inspector.js";
+import {
   convertAlignmentToValue,
   setDataToValue,
 } from "../core/utils/inspector.js";
 
 export class Inspector {
-  constructor({
-    inspectorDivId,
-    diagram,
-    inspectorInputs = [],
-    nodeDataKeys = [],
-  }) {
+  constructor({ inspectorDivId, diagram }) {
     this.inspectorDivId = inspectorDivId;
     this.diagram = diagram;
-    this.inspectorInputs = inspectorInputs;
-    this.nodeDataKeys = nodeDataKeys;
     this.inspectorContainer = document.getElementById(inspectorDivId);
     this.changedSelection();
     this.onModelChange();
@@ -24,14 +22,17 @@ export class Inspector {
       const part = this.diagram.selection.first();
       if (part instanceof go.Node) {
         const data = part.data;
-        console.log("data", data);
-
-        this.initUI(data);
+        if (data.category == "ImageNode") {
+          this.initUI(data, inspectorImageInputs);
+        } else {
+          this.initUI(data, inspectorInputs);
+        }
       }
     });
   }
-  initUI(data) {
-    for (let property of this.inspectorInputs) {
+  initUI(data, inspectorInputs) {
+    this.inspectorContainer.innerHTML = "";
+    for (let property of inspectorInputs) {
       const wrap = document.createElement("div");
       wrap.style.display = "flex";
       wrap.style.alignItems = "center";
@@ -75,14 +76,18 @@ export class Inspector {
   onModelChange() {
     const bindingTwoWayMap = [
       {
-        key: this.nodeDataKeys?.height,
-        id: this.nodeDataKeys?.height,
+        key: nodeDataKeys.height,
+        id: nodeDataKeys.height,
         default: 40,
       },
       {
-        key: this.nodeDataKeys?.width,
-        id: this.nodeDataKeys?.width,
+        key: nodeDataKeys.width,
+        id: nodeDataKeys.width,
         default: 40,
+      },
+      {
+        key: "location",
+        default: 0,
       },
     ];
 
@@ -99,7 +104,12 @@ export class Inspector {
         const property = bindingTwoWayMap.find(
           (item) => item.key == e.propertyName
         );
-        if (property) {
+        if (!property) return;
+        if (property.key == "location") {
+          const { x, y } = e.newValue;
+          setDataToValue(nodeDataKeys.locationX, x, property.default);
+          setDataToValue(nodeDataKeys.locationY, y, property.default);
+        } else {
           setDataToValue(property.id, e.newValue, property.default);
         }
       });

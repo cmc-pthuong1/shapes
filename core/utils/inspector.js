@@ -1,5 +1,4 @@
-
-export function convertAlignmentToValue(value) {  
+export function convertAlignmentToValue(value) {
   let align = "center";
   if (value == go.Spot.Left) {
     align = "left";
@@ -10,5 +9,7 @@ export function convertAlignmentToValue(value) {
 }
 
 export function setDataToValue(id, newValue, defaultValue) {
-  document.getElementById(id).value = newValue || defaultValue;
+  const input = document.getElementById(id);
+  if (!input) return;
+  input.value = newValue || defaultValue;
 }

@@ -54,4 +54,11 @@ export const nodeDataArray = [
     height: 30,
     textAlign: go.Spot.Center,
   },
+  {
+    category: "ImageNode",
+    source: "/assets/images/image-1.jpg",
+    name:'image',
+    width: 40,
+    height: 40,
+  },
 ];

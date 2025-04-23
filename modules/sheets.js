@@ -1,4 +1,5 @@
 import { Diagram } from "./diagram.js";
+import { ImageInserter } from "./imageInserter.js";
 import { Inspector } from "./inspector.js";
 
 export class Sheet {
@@ -6,8 +7,6 @@ export class Sheet {
     diagramContainerId,
     sheetListContainerId,
     nodeTemplate = null,
-    inspectorInputs = [],
-    nodeDataKeys = [],
   }) {
     this.diagramContainerId = diagramContainerId;
     this.sheetListContainer = document.getElementById(sheetListContainerId);
@@ -17,8 +16,6 @@ export class Sheet {
     this.sheetCount = 0;
     this.diagram = null;
     this.sheetList = null;
-    this.inspectorInputs = inspectorInputs;
-    this.nodeDataKeys = nodeDataKeys;
     this.inspector = null;
     this.initUI();
     this.addNewSheet(); // Khởi tạo sheet đầu tiên
@@ -63,10 +60,6 @@ export class Sheet {
     // Cập nhật sheet hiện tại
     this.currentSheet = sheetName;
 
-    // Làm sạch div hiển thị
-    const diagramDiv = document.getElementById(this.diagramContainerId);
-    diagramDiv.innerHTML = ""; // Làm sạch nội dung
-
     // Tạo Diagram với jsonModel
     const diagramControl = new Diagram({
       diagramDivId: this.diagramContainerId,
@@ -75,14 +68,20 @@ export class Sheet {
     });
 
     this.diagram = diagramControl.diagram;
+    // this.diagram.commandHandler.groupSelection();
 
     // Tạo lại inspector
     this.inspector = new Inspector({
       diagram: this.diagram,
       inspectorDivId: "inspector",
-      inspectorInputs: this.inspectorInputs,
-      nodeDataKeys: this.nodeDataKeys,
     });
+    // tạo insert image
+    const imageInserter = new ImageInserter({
+      diagram: this.diagram,
+      imageInserterDivId: "imageInserter",
+    });
+    
+    imageInserter.initUI()
 
     this.highlightActiveSheet(sheetName);
   }

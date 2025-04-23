@@ -1,3 +1,5 @@
+import { ImageTemplate } from "../core/constants/nodeTemplate.js";
+
 export class Palette {
   constructor({ paletteDivId, nodeTemplate, nodeDataArray }) {
     this.paletteContainer = document.getElementById(paletteDivId);
@@ -18,7 +20,9 @@ export class Palette {
         cellSize: new go.Size(2, 2),
       }),
     });
-    console.log(this.palette);
+
+    this.palette.nodeTemplateMap.add("ImageNode", ImageTemplate)
+
     this.palette.model.nodeDataArray = this.nodeDataArray;
   }
 }

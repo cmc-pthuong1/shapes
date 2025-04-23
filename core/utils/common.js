@@ -1,0 +1,33 @@
+export function convertImageToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      resolve(reader.result);
+    };
+
+    reader.onerror = () => {
+      reject(new Error("Error reading file"));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+export function getDimensionImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    img.src = src;
+
+    img.onload = function () {
+      resolve({
+        width: img.width,
+        height: img.height,
+        source: img.src,
+      });
+    };
+
+    img.onerror = () => reject(new Error("Error loading image"));
+  });
+}

@@ -21,6 +21,4 @@ const diagram = new Diagram({
 const inspector = new Inspector({
   diagram: diagram.diagram,
   inspectorDivId: "inspector",
-  inspectorInputs: inspectorInputs,
-  nodeDataKeys: nodeDataKeys,
 });

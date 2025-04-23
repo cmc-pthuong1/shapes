@@ -16,6 +16,4 @@ const sheetManager = new Sheet({
   diagramContainerId: "diagram",
   sheetListContainerId: "sheetList",
   nodeTemplate: nodeTemplate,
-  inspectorInputs: inspectorInputs,
-  nodeDataKeys: nodeDataKeys,
 });

@@ -13,7 +13,7 @@ export const nodeTemplate = new go.Node("Auto", {
   resizable: true,
   resizeObjectName: "MAIN",
 })
-  .bind(locationBinding)
+  .bindTwoWay(locationBinding)
   .add(
     new go.Shape("Circle", {
       name: "MAIN",
@@ -22,10 +22,10 @@ export const nodeTemplate = new go.Node("Auto", {
       portId: "",
       fromLinkable: true,
       toLinkable: true,
-      fromLinkableDuplicates: true,
-      toLinkableDuplicates: true,
-      fromLinkableSelfNode: true,
-      toLinkableSelfNode: true,
+      // fromLinkableDuplicates: true,
+      // toLinkableDuplicates: true,
+      // fromLinkableSelfNode: true,
+      // toLinkableSelfNode: true,
     })
       .bind("strokeWidth")
       .bind("stroke")
@@ -40,4 +40,24 @@ export const nodeTemplate = new go.Node("Auto", {
       .bind("text")
       .bind("stroke", "color")
       .bind("alignment", "textAlign")
+  );
+export const ImageTemplate = new go.Node("Auto", {
+  locationSpot: go.Spot.Left,
+  resizable: true,
+  resizeObjectName: "P",
+})
+  .bindTwoWay(locationBinding)
+  .add(
+    new go.Picture({
+      name: "P",
+      // maxSize: new go.Size(200, 200),
+      stretch: go.GraphObject.Uniform,
+      background: "transparent",
+      portId: "",
+      fromLinkable: true,
+      toLinkable: true,
+    })
+      .bind("source")
+      .bindTwoWay("width")
+      .bindTwoWay("height")
   );
