@@ -20,6 +20,23 @@ export class ImageInserter {
     this.imageInserterContainer.appendChild(input);
   }
 
+  imageDropEvent() {
+    console.log(this.diagram.div);
+    this.diagram.div.ondragover = (e) => e.preventDefault();
+    this.diagram.div.ondrop = async (e) => {
+      e.preventDefault();
+      const files = e.dataTransfer.files;
+      if (!files?.length) return;
+      for (const file of files) {
+        if (!file.type.startsWith("image/")) continue;
+        const source = await convertImageToBase64(file);
+        const imageInfo = await getDimensionImage(source);
+        const position = this.diagram.lastInput.documentPoint || { x: 0, y: 0 };
+        this.insertImage({ ...imageInfo, ...position });
+      }
+    };
+  }
+
   async onChangeInput(e) {
     const file = e.target.files[0];
     const source = await convertImageToBase64(file);
@@ -27,13 +44,13 @@ export class ImageInserter {
     this.insertImage(imageInfo, this.diagram);
   }
 
-  insertImage({ source, width, height }) {
+  insertImage({ source, width, height, x = 0, y = 0 }) {
     const newNodeData = {
       category: "ImageNode",
       source: source,
       name: "image",
-      x: 0,
-      y: 0,
+      x,
+      y,
       width: width || 100,
       height: height || 100,
     };

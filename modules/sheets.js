@@ -83,6 +83,7 @@ export class Sheet {
     // bật chức năng insert ảnh
     imageInserter.initUI()
     imageInserter.onDocumentPasteImage()
+    imageInserter.imageDropEvent()
 
     this.highlightActiveSheet(sheetName);
   }
