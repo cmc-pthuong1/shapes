@@ -14,7 +14,7 @@ export class Diagram {
       "undoManager.isEnabled": true,
       "animationManager.isEnabled": false,
       initialAutoScale: go.Diagram.None,
-      initialContentAlignment: go.Spot.Left,
+      initialContentAlignment: go.Spot.TopLeft,
     });
 
     this.diagram.nodeTemplate = this.nodeTemplate;

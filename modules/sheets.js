@@ -47,7 +47,10 @@ export class Sheet {
   switchSheet(sheetName) {
     // Lưu sơ đồ hiện tại
     if (this.diagram && this.currentSheet) {
-      this.sheetModels[this.currentSheet] = this.diagram.model.toJson();
+      this.sheetModels[this.currentSheet] = {
+        model: this.diagram.model.toJson(),
+        position: go.Point.stringify(this.diagram.position),
+      };
     }
 
     // Hủy liên kết Diagram cũ trước khi tạo mới
@@ -60,14 +63,10 @@ export class Sheet {
     // Cập nhật sheet hiện tại
     this.currentSheet = sheetName;
 
-    // Tạo Diagram với jsonModel
-    const diagramControl = new Diagram({
-      diagramDivId: this.diagramContainerId,
-      jsonModel: this.sheetModels[sheetName],
-      nodeTemplate: this.nodeTemplate,
-    });
+    // Tạo Diagram mới
+    const newDiagram = this.innitDiagram(this.sheetModels?.[sheetName] || {});
 
-    this.diagram = diagramControl.diagram;
+    this.diagram = newDiagram;
     // this.diagram.commandHandler.groupSelection();
 
     // Tạo lại inspector
@@ -86,6 +85,21 @@ export class Sheet {
     imageInserter.enableImageDropEvent();
 
     this.highlightActiveSheet(sheetName);
+  }
+
+  innitDiagram({ model = null, position = null }) {
+    const newDiagramControl = new Diagram({
+      diagramDivId: this.diagramContainerId,
+      jsonModel: model,
+      nodeTemplate: this.nodeTemplate,
+    });
+    const newDiagram = newDiagramControl.diagram
+    if (position) {
+      newDiagram.addDiagramListener("InitialLayoutCompleted", () => {
+        newDiagram.position = go.Point.parse(position);
+      });
+    }
+    return newDiagram;
   }
 
   highlightActiveSheet(name) {
