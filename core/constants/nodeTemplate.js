@@ -1,20 +1,20 @@
-const locationBinding = new go.Binding(
-  "location",
-  "",
-  (data) => new go.Point(data.x, data.y)
-);
-locationBinding.makeTwoWay((point, data) => {
-  data.x = point.x;
-  data.y = point.y;
-  return data;
-});
 export const nodeTemplate = new go.Node("Auto", {
   locationSpot: go.Spot.Center,
   resizable: true,
   resizeObjectName: "MAIN",
   selectionAdorned: false,
 })
-  .bindTwoWay(locationBinding)
+  .bindTwoWay(
+    "location",
+    "",
+    (data) => new go.Point(data.x, data.y), // binding
+    (point, data) => {
+      //make two way
+      data.x = point.x;
+      data.y = point.y;
+      return data;
+    }
+  )
   .add(
     new go.Shape("Circle", {
       name: "MAIN",
@@ -43,16 +43,6 @@ export const nodeTemplate = new go.Node("Auto", {
       .bind("alignment", "textAlign")
   );
 
-const locationImageBinding = new go.Binding(
-  "location",
-  "",
-  (data) => new go.Point(data.x, data.y)
-);
-locationImageBinding.makeTwoWay((point, data) => {
-  data.x = point.x;
-  data.y = point.y;
-  return data;
-});
 export const ImageTemplate = new go.Node("Auto", {
   locationSpot: go.Spot.Center,
   resizable: true,
@@ -61,7 +51,17 @@ export const ImageTemplate = new go.Node("Auto", {
   selectionAdorned: false, // không hiện khung xanh bao quanh node khi chọn node
   rotateObjectName: "P",
 })
-  .bindTwoWay(locationImageBinding)
+  .bindTwoWay(
+    "location",
+    "",
+    (data) => new go.Point(data.x, data.y), // binding
+    (point, data) => {
+      //make two way
+      data.x = point.x;
+      data.y = point.y;
+      return data;
+    }
+  )
   .add(
     new go.Picture({
       name: "P",
