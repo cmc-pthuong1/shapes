@@ -1,4 +1,4 @@
-import { fromLocation, toLocation } from "../utils/common.js";
+import { fromLocation, toFont, toLocation } from "../utils/common.js";
 
 export const nodeTemplate = new go.Node("Auto", {
   locationSpot: go.Spot.Center,
@@ -32,12 +32,14 @@ export const nodeTemplate = new go.Node("Auto", {
       .bindTwoWay("width")
       .bindTwoWay("height"),
     new go.TextBlock({
-      font: "10pt sans-serif",
+      editable: true,
+      // font: fontDefault, //font-style font-variant font-weight font-size font-family
       // alignment: go.Spot.Left
     })
       .bind("text")
       .bind("stroke", "color")
       .bind("alignment", "textAlign")
+      .bind("font", "", toFont)
   );
 
 export const ImageTemplate = new go.Node("Auto", {

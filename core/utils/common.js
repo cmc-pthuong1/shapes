@@ -1,3 +1,5 @@
+import { fontDefault } from "../constants/common.js";
+
 export function convertImageToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -53,4 +55,15 @@ export function fromLocation(point, data, model) {
   data.x = point.x;
   data.y = point.y;
   return data;
+}
+
+
+export function toFont(data, node) {
+  const {
+    fontStyle = "normal",
+    fontWeight = "normal",
+    fontSize = 10,
+    fontFamily = "sans-serif",
+  } = data;
+  return [fontStyle, fontWeight, `${fontSize}pt`, fontFamily].join(" ");
 }

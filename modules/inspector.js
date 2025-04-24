@@ -49,25 +49,20 @@ export class Inspector {
       wrap.appendChild(label);
 
       if (type == "select") {
-        const select = document.createElement("select");
-        options.forEach((option) => {
-          const opt = document.createElement("option");
-          opt.value = option.value;
-          opt.textContent = option.label;
-          select.appendChild(opt);
+        const select = this.createSelectElement({
+          options: options,
+          key: key,
+          value: data[key],
+          defaultValue: defaultValue,
         });
-        select.name = key;
-        select.id = key;
-        select.value = convertAlignmentToValue(data[key]);
-        select.onchange = (event) => this.onChangeAlignmentProperty(event, key);
         wrap.appendChild(select);
       } else {
-        const input = document.createElement("input");
-        input.type = type;
-        input.name = key;
-        input.id = key;
-        input.value = data[key] || defaultValue;
-        input.onchange = (event) => this.onChangeDataProperty(event, key, type);
+        const input = this.createInputElement({
+          defaultValue: defaultValue,
+          value: data[key],
+          key: key,
+          type: type,
+        });
         wrap.appendChild(input);
       }
       this.inspectorContainer.appendChild(wrap);
@@ -144,5 +139,45 @@ export class Inspector {
       this.diagram.model.setDataProperty(node.data, name, value);
       this.diagram.model.commitTransaction(`update ${name}`);
     }
+  }
+
+  createInputElement({
+    type = "text",
+    key = "",
+    value = "",
+    defaultValue = "",
+  }) {
+    const input = document.createElement("input");
+    input.type = type;
+    input.name = key;
+    input.id = key;
+    input.value = value || defaultValue;
+    input.onchange = (event) => this.onChangeDataProperty(event, key, type);
+    return input;
+  }
+
+  createSelectElement({
+    options,
+    key = "",
+    value = null,
+    defaultValue = null,
+  }) {
+    const select = document.createElement("select");
+    options.forEach((option) => {
+      const opt = document.createElement("option");
+      opt.value = option.value;
+      opt.textContent = option.label;
+      select.appendChild(opt);
+    });
+    select.name = key;
+    select.id = key;
+    if (key == nodeDataKeys.textAlign) {
+      select.value = convertAlignmentToValue(value);
+      select.onchange = (event) => this.onChangeAlignmentProperty(event, key);
+    } else {
+      select.value = value || defaultValue;
+      select.onchange = (event) => this.onChangeDataProperty(event, key);
+    }
+    return select;
   }
 }

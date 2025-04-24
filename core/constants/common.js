@@ -1,0 +1,1 @@
+export const fontDefault = "normal 600 10pt sans-serif"
