@@ -11,7 +11,7 @@ export class Sheet {
     this.diagramContainerId = diagramContainerId;
     this.sheetListContainer = document.getElementById(sheetListContainerId);
     this.nodeTemplate = nodeTemplate; // Hàm cấu hình nodeTemplate, linkTemplate nếu có
-    this.sheetModels = {};
+    this.sheetModels = {}; // { [name]: {model, position} }
     this.currentSheet = null;
     this.sheetCount = 0;
     this.diagram = null;
@@ -93,7 +93,7 @@ export class Sheet {
       jsonModel: model,
       nodeTemplate: this.nodeTemplate,
     });
-    const newDiagram = newDiagramControl.diagram
+    const newDiagram = newDiagramControl.diagram;
     if (position) {
       newDiagram.addDiagramListener("InitialLayoutCompleted", () => {
         newDiagram.position = go.Point.parse(position);
@@ -111,8 +111,12 @@ export class Sheet {
   exportAllJson() {
     const data = {
       ...this.sheetModels,
-      [this.currentSheet]: this.diagram.model.toJson(),
+      [this.currentSheet]: {
+        model: this.diagram.model.toJson(),
+        position: go.Point.stringify(this.diagram.position),
+      },
     };
+    console.log("🚀 ~ Sheet ~ exportAllJson ~ data:", data)
     const jsonData = JSON.stringify(data);
     const blob = new Blob([jsonData], { type: "application/json" });
     const url = URL.createObjectURL(blob);
