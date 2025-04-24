@@ -7,16 +7,19 @@ const mimeTypes = {
  '.html': 'text/html',
  '.css': 'text/css',
  '.js': 'application/javascript',
+ '.json': 'application/json',
  '.png': 'image/png',
  '.jpg': 'image/jpeg',
  '.jpeg': 'image/jpeg',
  '.gif': 'image/gif',
  '.svg': 'image/svg+xml',
- '.ico': 'image/x-icon'
+ '.ico': 'image/x-icon',
 };
 const server = http.createServer((req, res) => {
  let filePath = req.url === '/' ? '/index.html' : req.url;
+ //kết hợp __dirname với filePath để tạo ra một đường dẫn tuyệt đối
  filePath = path.join(__dirname, filePath);
+ // lấy phần mở rộng(extension) của một đường dẫn file
  const extname = path.extname(filePath);
  const contentType = mimeTypes[extname] || 'application/octet-stream';
  fs.readFile(filePath, (err, content) => {

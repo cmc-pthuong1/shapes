@@ -1,14 +1,25 @@
 .app {
   height: calc(100% - 40px);
 }
-.sheets {
+.bottomBar {
   height: 40px;
   background-color: white;
   display: flex;
-
+  /* justify-content: space-between; */
 }
-button {
-    border-left: none;
-    background-color: white;
-    height:100%;
+.sheets {
+  height: 100%;
+  display: flex;
+  flex-grow: 1;
+}
+.sheets button {
+  border-left: none;
+  background-color: white;
+  height: 100%;
+}
+
+.export-btn {
+  height: 100%;
+  background-color: white;
+  flex-shrink: 0;
 }

@@ -20,8 +20,7 @@ export class ImageInserter {
     this.imageInserterContainer.appendChild(input);
   }
 
-  imageDropEvent() {
-    console.log(this.diagram.div);
+  enableImageDropEvent() {
     this.diagram.div.ondragover = (e) => e.preventDefault();
     this.diagram.div.ondrop = async (e) => {
       e.preventDefault();
@@ -68,11 +67,12 @@ export class ImageInserter {
     }
   }
 
-  onDocumentPasteImage() {
+  enableDocumentPasteImage() {
     // const _ = this;
     document.addEventListener("paste", async (event) => {
       const items = (event.clipboardData || window.clipboardData).items;
       if (!items) return;
+      console.log('paste')
       for (let item of items) {
         if (item.type.startsWith("image/")) {
           const blob = item.getAsFile();

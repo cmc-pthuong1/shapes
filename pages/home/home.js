@@ -1,7 +1,3 @@
-import {
-  inspectorInputs,
-  nodeDataKeys,
-} from "../../core/constants/inspector.js";
 import { nodeTemplate } from "../../core/constants/nodeTemplate.js";
 import { nodeDataArray } from "../../core/constants/shapes.js";
 import { Diagram } from "../../modules/diagram.js";

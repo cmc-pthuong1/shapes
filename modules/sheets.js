@@ -81,9 +81,9 @@ export class Sheet {
       imageInserterDivId: "imageInserter",
     });
     // bật chức năng insert ảnh
-    imageInserter.initUI()
-    imageInserter.onDocumentPasteImage()
-    imageInserter.imageDropEvent()
+    imageInserter.initUI();
+    imageInserter.enableDocumentPasteImage();
+    imageInserter.enableImageDropEvent();
 
     this.highlightActiveSheet(sheetName);
   }
@@ -93,6 +93,23 @@ export class Sheet {
       btn.style.backgroundColor = btn.textContent === name ? "#b3d4fc" : "";
     });
   }
+
+  exportAllJson() {
+    const data = {
+      ...this.sheetModels,
+      [this.currentSheet]: this.diagram.model.toJson(),
+    };
+    const jsonData = JSON.stringify(data);
+    const blob = new Blob([jsonData], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "data.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
   getCurrentDiagram() {
     return this.diagram;
   }

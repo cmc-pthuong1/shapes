@@ -1,7 +1,3 @@
-import {
-  inspectorInputs,
-  nodeDataKeys,
-} from "../../core/constants/inspector.js";
 import { nodeTemplate } from "../../core/constants/nodeTemplate.js";
 import { nodeDataArray } from "../../core/constants/shapes.js";
 import { Palette } from "../../modules/palette.js";
@@ -17,3 +13,5 @@ const sheetManager = new Sheet({
   sheetListContainerId: "sheetList",
   nodeTemplate: nodeTemplate,
 });
+
+window.exportAllJson = () => sheetManager.exportAllJson()
