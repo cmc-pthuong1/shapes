@@ -1,3 +1,5 @@
+import { fromLocation, toLocation } from "../utils/common.js";
+
 export const nodeTemplate = new go.Node("Auto", {
   locationSpot: go.Spot.Center,
   resizable: true,
@@ -7,13 +9,8 @@ export const nodeTemplate = new go.Node("Auto", {
   .bindTwoWay(
     "location",
     "",
-    (data) => new go.Point(data.x, data.y), // binding
-    (point, data) => {
-      //make two way
-      data.x = point.x;
-      data.y = point.y;
-      return data;
-    }
+    toLocation, // binding
+    fromLocation //make two way
   )
   .add(
     new go.Shape("Circle", {
@@ -54,13 +51,8 @@ export const ImageTemplate = new go.Node("Auto", {
   .bindTwoWay(
     "location",
     "",
-    (data) => new go.Point(data.x, data.y), // binding
-    (point, data) => {
-      //make two way
-      data.x = point.x;
-      data.y = point.y;
-      return data;
-    }
+    toLocation, // binding
+    fromLocation //make two way
   )
   .add(
     new go.Picture({

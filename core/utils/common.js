@@ -44,3 +44,13 @@ export function getDimensionImage(src) {
     img.onerror = () => reject(new Error("Error loading image"));
   });
 }
+
+export function toLocation(data, node) {
+  return new go.Point(data.x, data.y);
+}
+
+export function fromLocation(point, data, model) {
+  data.x = point.x;
+  data.y = point.y;
+  return data;
+}
