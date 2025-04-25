@@ -30,8 +30,11 @@ export class ImageInserter {
         if (!file.type.startsWith("image/")) continue;
         const source = await convertImageToBase64(file);
         const imageInfo = await getDimensionImage(source);
-        const position = this.diagram.lastInput.documentPoint || { x: 0, y: 0 };
-        this.insertImage({ ...imageInfo, ...position });
+        const position = this.diagram.lastInput.documentPoint || {
+          px: 0,
+          py: 0,
+        };
+        this.insertImage({ ...imageInfo, x: position.px, y: position.py });
       }
     };
   }
@@ -40,10 +43,11 @@ export class ImageInserter {
     const file = e.target.files[0];
     const source = await convertImageToBase64(file);
     const imageInfo = await getDimensionImage(source);
-    this.insertImage(imageInfo, this.diagram);
+    this.insertImage(imageInfo);
   }
 
   insertImage({ source, width, height, x = 0, y = 0 }) {
+    console.log(x, y);
     const newNodeData = {
       category: "ImageNode",
       source: source,
@@ -72,7 +76,7 @@ export class ImageInserter {
     document.addEventListener("paste", async (event) => {
       const items = (event.clipboardData || window.clipboardData).items;
       if (!items) return;
-      console.log('paste')
+      console.log("paste");
       for (let item of items) {
         if (item.type.startsWith("image/")) {
           const blob = item.getAsFile();
