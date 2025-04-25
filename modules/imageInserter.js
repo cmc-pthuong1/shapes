@@ -47,7 +47,6 @@ export class ImageInserter {
   }
 
   insertImage({ source, width, height, x = 0, y = 0 }) {
-    console.log(x, y);
     const newNodeData = {
       category: "ImageNode",
       source: source,
@@ -72,7 +71,6 @@ export class ImageInserter {
   }
 
   enableDocumentPasteImage() {
-    // const _ = this;
     document.addEventListener("paste", async (event) => {
       const items = (event.clipboardData || window.clipboardData).items;
       if (!items) return;
