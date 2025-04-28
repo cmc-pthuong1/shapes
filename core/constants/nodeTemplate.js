@@ -101,4 +101,6 @@ export const ImageTemplate = new go.Node("Auto", {
 export const linkTemplate = new go.Link({
   relinkableFrom: true,
   relinkableTo: true,
+  routing: go.Routing.AvoidsNodes,
+  corner: 10, // rounded corners
 }).add(new go.Shape(), new go.Shape({ toArrow: "Standard" }));
