@@ -1,4 +1,10 @@
-import { fromLocation, toFont, toLocation } from "../utils/common.js";
+import {
+  fromLocation,
+  toFont,
+  toHeight,
+  toLocation,
+  toWidth,
+} from "../utils/common.js";
 
 export const nodeTemplate = new go.Node("Auto", {
   locationSpot: go.Spot.Center,
@@ -31,6 +37,16 @@ export const nodeTemplate = new go.Node("Auto", {
       .bind("figure")
       .bindTwoWay("width")
       .bindTwoWay("height"),
+    new go.Shape("Circle", {
+      fill: "transparent",
+      stroke: "transparent",
+      alignmentFocus: go.Spot.Center,
+      name: "SUB",
+      cursor: "move",
+    })
+      .bind("figure")
+      .bind("width", "", toWidth)
+      .bind("height", "", toHeight),
     new go.TextBlock({
       editable: true,
       // font: fontDefault, //font-style font-variant font-weight font-size font-family
@@ -68,7 +84,18 @@ export const ImageTemplate = new go.Node("Auto", {
     })
       .bind("source")
       .bindTwoWay("width")
-      .bindTwoWay("height")
+      .bindTwoWay("height"),
+
+    new go.Shape("Rectangle", {
+      fill: "transparent",
+      stroke: "transparent",
+      alignmentFocus: go.Spot.Center,
+      name: "SUB",
+      cursor: "move",
+    })
+      .bind("figure")
+      .bind("width", "", toWidth)
+      .bind("height", "", toHeight)
   );
 
 export const linkTemplate = new go.Link({

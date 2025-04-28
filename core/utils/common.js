@@ -57,7 +57,6 @@ export function fromLocation(point, data, model) {
   return data;
 }
 
-
 export function toFont(data, node) {
   const {
     fontStyle = "normal",
@@ -66,4 +65,12 @@ export function toFont(data, node) {
     fontFamily = "sans-serif",
   } = data;
   return [fontStyle, fontWeight, `${fontSize}pt`, fontFamily].join(" ");
+}
+
+export function toWidth(data, node) {
+  return Math.max(data.width - 60, 20);
+}
+
+export function toHeight(data, node) {
+  return Math.max(data.height - 60, 20);
 }
