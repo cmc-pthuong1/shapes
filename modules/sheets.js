@@ -7,10 +7,14 @@ export class Sheet {
     diagramContainerId,
     sheetListContainerId,
     nodeTemplate = null,
+    nodeTemplateMap ,
+    linkTemplate
   }) {
     this.diagramContainerId = diagramContainerId;
     this.sheetListContainer = document.getElementById(sheetListContainerId);
     this.nodeTemplate = nodeTemplate; // Hàm cấu hình nodeTemplate, linkTemplate nếu có
+    this.nodeTemplateMap = nodeTemplateMap
+    this.linkTemplate = linkTemplate
     this.sheetModels = {}; // { [name]: {model, position} }
     this.currentSheet = null;
     this.sheetCount = 0;
@@ -92,6 +96,8 @@ export class Sheet {
       diagramDivId: this.diagramContainerId,
       jsonModel: model,
       nodeTemplate: this.nodeTemplate,
+      nodeTemplateMap: this.nodeTemplateMap,
+      linkTemplate: this.linkTemplate
     });
     const newDiagram = newDiagramControl.diagram;
     if (position) {

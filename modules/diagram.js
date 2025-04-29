@@ -1,12 +1,19 @@
 import { ImageTemplate, linkTemplate } from "../core/constants/nodeTemplate.js";
 
 export class Diagram {
-  constructor({ diagramDivId, jsonModel, nodeTemplate, nodeTemplateMap }) {
+  constructor({
+    diagramDivId,
+    jsonModel,
+    nodeTemplate,
+    nodeTemplateMap,
+    linkTemplate,
+  }) {
     this.diagramContainer = document.getElementById(diagramDivId);
     this.diagramDivId = diagramDivId;
     this.jsonModel = jsonModel;
     this.nodeTemplate = nodeTemplate;
     this.nodeTemplateMap = nodeTemplateMap;
+    this.linkTemplate = linkTemplate;
     this.diagram = null;
     this.initDiagram();
   }
@@ -32,7 +39,7 @@ export class Diagram {
     //change position of rotate tool from right to top of node
     this.diagram.toolManager.rotatingTool.handleAngle = 270;
     //RelinkingTool
-    this.diagram.linkTemplate = linkTemplate;
+    this.diagram.linkTemplate = this.linkTemplate || linkTemplate;
 
     if (this.jsonModel) {
       this.diagram.model = go.Model.fromJson(this.jsonModel);
