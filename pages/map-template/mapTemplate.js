@@ -40,7 +40,6 @@ const tankTemplate = new go.Node("Spot", {
   itemTemplate: tankPort,
   resizable: true,
   resizeObjectName: "Main",
-  clip: true,
 })
   .bind("itemArray", "ports")
   .add(
@@ -71,13 +70,62 @@ const tankTemplate = new go.Node("Spot", {
     )
   );
 
+const monitorTemplate = new go.Node("Auto", {
+  resizable: true,
+  minSize: new go.Size(100, 40),
+  toLinkable: true,
+  portId: "monitor",
+}).add(
+  new go.Shape({ fill: "transparent", strokeWidth: 2, stroke: colors.white }),
+  new go.Panel("Vertical", {
+    margin: 10,
+    stretch: go.Stretch.Fill,
+    stroke: colors.black,
+    strokeWidth: 2,
+  }).add(
+    new go.TextBlock().bind("text", "label"),
+    new go.Panel("Table", {
+      // defaultRowSeparatorStroke: colors.black,
+      // defaultColumnSeparatorStroke: colors.black,
+      stretch: go.Stretch.Fill,
+      itemTemplate: new go.Panel("TableRow").add(
+        new go.TextBlock({
+          row: 0,
+          column: 0,
+          margin: 2,
+          textAlign: "left",
+          stretch: go.Stretch.Fill,
+        }).bind("text", "label"),
+        new go.TextBlock({
+          row: 0,
+          column: 1,
+          margin: 2,
+          textAlign: "left",
+          overflow: go.TextOverflow.Ellipsis,
+          stretch: go.Stretch.Fill,
+        }).bind("text", "value"),
+        new go.TextBlock({
+          row: 0,
+          column: 2,
+          margin: 2,
+          textAlign: "right",
+          overflow: go.TextOverflow.Ellipsis,
+          stretch: go.Stretch.Fill,
+        }).bind("text", "unit")
+      ),
+    }).bind("itemArray", "parameters")
+  )
+);
+
 const portColor = {
   BR1: colors.green,
   BR2: colors.red,
+  monitor: colors.white,
 };
 
 const nodeTemplateMap = {
   tank: tankTemplate,
+  monitor: monitorTemplate,
 };
 
 const paletteData = [
@@ -120,6 +168,27 @@ const paletteData = [
       { p: "BR2", a: new go.Spot(1, 0.9), ts: go.Spot.Right },
     ],
   },
+  {
+    category: "monitor",
+    label: "monitor",
+    parameters: [
+      {
+        label: "T",
+        value: "0",
+        unit: "°C",
+      },
+      {
+        label: "P",
+        value: "1",
+        unit: "atm",
+      },
+      {
+        label: "Q",
+        value: "1",
+        unit: "m³/s",
+      },
+    ],
+  },
 ];
 
 console.log(paletteData);
@@ -149,23 +218,20 @@ const linkTemplate = new go.Link({
       strokeWidth: 3.5,
       stroke: colors.green,
       isPanelMain: true,
-    }).bind(
-      "stroke",
-      "fromPort",
-      (fromPort) => portColor[fromPort] || colors.blue
-    ),
+    }).bind("stroke", "", (data, node) => {
+      if (data.toPort == "monitor") return portColor[data.toPort];
+      return portColor[data.fromPort] || colors.blue;
+    }),
     new go.Shape({
       fill: colors.green,
       toArrow: "Triangle",
       scale: 1.4,
       stroke: colors.black,
     })
-      // .bind("stroke", "fromPort", (fromPort) => portColor[fromPort] || colors.black)
-      .bind(
-        "fill",
-        "fromPort",
-        (fromPort) => portColor[fromPort] || colors.blue
-      )
+      .bind("stroke", "", (data, node) => {
+        if (data.toPort == "monitor") return portColor[data.toPort];
+        return portColor[data.fromPort] || colors.blue;
+      })
 
     // new go.Shape({ strokeWidth: 4 }).bind(
     //   "stroke",
