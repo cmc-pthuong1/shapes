@@ -18,12 +18,16 @@ const colors = {
   yellow: "#f9c66a",
   orange: "#e48042",
   red: "#ed2d44",
+  transparent: "transparent",
 };
 
 const tank1 = "F M0 0 H50 V-100 H0z";
 // const tank2 = "F M0 0 Q25 -25 50 0 V87.5 H0z";
 const tank2 = "F M 0 100 L 0 25 A 25 25 0 0 1 50 25 L 50 100 z";
 const tank3 = "F M0 100 L0 25 L25 0 50 25 V100z ";
+
+//valve
+const valve1 = "F M0 0 L50 25 50 0 0 25z M25 12.5 L25 -12 M12.5 -12 H36";
 
 const tankPort = new go.Panel({
   fromLinkable: true,
@@ -46,12 +50,12 @@ const tankTemplate = new go.Node("Spot", {
     new go.Panel("Spot", {
       strokeWidth: 2,
       clip: true,
-      stroke: colors.black,
     }).add(
       new go.Shape({
         name: "Main",
 
         geometryString: tank1,
+        stroke: colors.black,
         fill: new go.Brush("Linear", {
           0: go.Brush.darken(colors.white),
           0.2: colors.white,
@@ -84,6 +88,15 @@ const monitorTemplate = new go.Node("Auto", {
     strokeWidth: 2,
   }).add(
     new go.TextBlock().bind("text", "label"),
+    new go.Panel("Horizontal").add(
+      new go.Shape("Circle", { width: 8, height: 8 }).bind(
+        "fill",
+        "",
+        (data, node) => {
+          return data.connected ? colors.green : colors.red;
+        }
+      )
+    ),
     new go.Panel("Table", {
       // defaultRowSeparatorStroke: colors.black,
       // defaultColumnSeparatorStroke: colors.black,
@@ -117,6 +130,36 @@ const monitorTemplate = new go.Node("Auto", {
   )
 );
 
+const valveTemplate = new go.Node("Spot", {
+  resizable: true,
+  toLinkable: true,
+  fromLinkable: true,
+  rotatable: true,
+}).add(
+  new go.Shape({
+    name: "Main",
+    geometryString: valve1,
+    stroke: colors.red,
+    fill: colors.gray,
+    portId: "",
+    fromSpot: new go.Spot(1, 0.65),
+    toSpot: new go.Spot(0, 0.65),
+  })
+    .bind("fill")
+    .bind("stroke")
+    .bind("geometryString", "valveType"),
+
+  new go.Shape("Circle", {
+    portId: "monitor",
+    fromLinkable: true,
+    with: 5,
+    height: 5,
+    alignment: new go.Spot(0.5, 0.65),
+    fill: colors.transparent,
+    stroke: colors.transparent,
+  })
+);
+
 const portColor = {
   BR1: colors.green,
   BR2: colors.red,
@@ -126,6 +169,7 @@ const portColor = {
 const nodeTemplateMap = {
   tank: tankTemplate,
   monitor: monitorTemplate,
+  valve: valveTemplate,
 };
 
 const paletteData = [
@@ -171,6 +215,7 @@ const paletteData = [
   {
     category: "monitor",
     label: "monitor",
+    connected: false,
     parameters: [
       {
         label: "T",
@@ -188,6 +233,13 @@ const paletteData = [
         unit: "m³/s",
       },
     ],
+  },
+  {
+    category: "valve",
+    valveType: valve1,
+    fill: colors.white,
+    stroke: colors.gray,
+    ports: { p: "BL1", a: new go.Spot(0, 0.5), ts: go.Spot.Left },
   },
 ];
 
@@ -227,11 +279,10 @@ const linkTemplate = new go.Link({
       toArrow: "Triangle",
       scale: 1.4,
       stroke: colors.black,
+    }).bind("stroke", "", (data, node) => {
+      if (data.toPort == "monitor") return portColor[data.toPort];
+      return portColor[data.fromPort] || colors.blue;
     })
-      .bind("stroke", "", (data, node) => {
-        if (data.toPort == "monitor") return portColor[data.toPort];
-        return portColor[data.fromPort] || colors.blue;
-      })
 
     // new go.Shape({ strokeWidth: 4 }).bind(
     //   "stroke",
@@ -309,4 +360,54 @@ diagram.model = new go.GraphLinksModel({
   linkFromPortIdProperty: "fromPort", // required information:
   linkToPortIdProperty: "toPort", // identifies data property names
   linkDataArray: linkDataArray,
+});
+
+// function updateNodeConnection(node) {
+//   const isConnected = node.linksConnected.count > 0;
+//   const isMonitor = node._t.category == "monitor";
+//   if (isMonitor) {
+//     diagram.model.setDataProperty(node.data, "connected", isConnected);
+//   }
+// }
+
+// diagram.addDiagramListener("LinkDrawn", function (e) {
+//   updateNodeConnection(e.subject.toNode);
+// });
+
+// diagram.addDiagramListener("LinkRemoved", function (e) {
+//   // e.subject.fromNode.updateTargetBindings();
+//   // e.subject.toNode.updateTargetBindings();
+//   console.log("🚀 ~ e.subject.fromNode:", e.subject.fromNode);
+//   console.log("🚀 ~ e.subject.toNode:", e.subject.toNode);
+// });
+
+diagram.addDiagramListener("LinkRelinked", function (e) {
+  console.log("🚀 ~ e:", e)
+  // e.subject.fromNode.updateTargetBindings();
+  // e.subject.toNode.updateTargetBindings();
+  console.log("🚀 ~ LinkRelinked e.subject.fromNode:", e.subject.fromNode);
+  console.log("🚀 ~ LinkRelinked e.subject.toNode:", e.subject.toNode);
+});
+
+diagram.addDiagramListener("SelectionDeleted", function (e) {
+  console.log(e.subject.toNode);
+  e.subject.each((part) => {
+    if (part instanceof go.Link) {
+      console.log("Đã xoá link:", part.data);
+    }
+  });
+});
+diagram.model.addChangedListener(function (evt) {
+  if (evt.propertyName === "linkDataArray") {
+
+    const deletedLink = evt?.oldValue;
+    const link = evt.newValue;
+    const toKey =
+      evt.change === go.ChangedEvent.Remove ? deletedLink.to : link.to;
+
+    const toNodeData = diagram.model.findNodeDataForKey(toKey);
+    let isConnected = evt.change != go.ChangedEvent.Remove;
+    toNodeData.connected = isConnected;
+    diagram.model.updateTargetBindings(toNodeData);
+  }
 });
