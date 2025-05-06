@@ -77,15 +77,20 @@ const tankTemplate = new go.Node("Spot", {
 const monitorTemplate = new go.Node("Auto", {
   resizable: true,
   minSize: new go.Size(100, 40),
-  toLinkable: true,
-  portId: "monitor",
 }).add(
-  new go.Shape({ fill: "transparent", strokeWidth: 2, stroke: colors.white }),
+  new go.Shape({
+    fill: "transparent",
+    strokeWidth: 2,
+    stroke: colors.white,
+    toLinkable: true,
+    portId: "monitor",
+  }),
   new go.Panel("Vertical", {
     margin: 10,
     stretch: go.Stretch.Fill,
     stroke: colors.black,
     strokeWidth: 2,
+    cursor: "move",
   }).add(
     new go.TextBlock().bind("text", "label"),
     new go.Panel("Horizontal").add(
@@ -132,18 +137,15 @@ const monitorTemplate = new go.Node("Auto", {
 
 const valveTemplate = new go.Node("Spot", {
   resizable: true,
-  toLinkable: true,
-  fromLinkable: true,
   rotatable: true,
+  resizeObjectName: "Main",
 }).add(
   new go.Shape({
     name: "Main",
     geometryString: valve1,
     stroke: colors.red,
     fill: colors.gray,
-    portId: "",
-    fromSpot: new go.Spot(1, 0.65),
-    toSpot: new go.Spot(0, 0.65),
+    cursor: "move",
   })
     .bind("fill")
     .bind("stroke")
@@ -155,6 +157,24 @@ const valveTemplate = new go.Node("Spot", {
     with: 5,
     height: 5,
     alignment: new go.Spot(0.5, 0.65),
+    fill: colors.transparent,
+    stroke: colors.transparent,
+  }),
+  new go.Shape("Circle", {
+    portId: "valve-input",
+    toLinkable: true,
+    with: 5,
+    height: 5,
+    alignment: new go.Spot(0, 0.65, 3, 0),
+    fill: colors.transparent,
+    stroke: colors.transparent,
+  }),
+  new go.Shape("Circle", {
+    portId: "valve-output",
+    fromLinkable: true,
+    with: 5,
+    height: 5,
+    alignment: new go.Spot(1, 0.65, -3, 0),
     fill: colors.transparent,
     stroke: colors.transparent,
   })
@@ -362,44 +382,51 @@ diagram.model = new go.GraphLinksModel({
   linkDataArray: linkDataArray,
 });
 
-// function updateNodeConnection(node) {
-//   const isConnected = node.linksConnected.count > 0;
-//   const isMonitor = node._t.category == "monitor";
-//   if (isMonitor) {
-//     diagram.model.setDataProperty(node.data, "connected", isConnected);
-//   }
-// }
-
-// diagram.addDiagramListener("LinkDrawn", function (e) {
-//   updateNodeConnection(e.subject.toNode);
-// });
-
-// diagram.addDiagramListener("LinkRemoved", function (e) {
-//   // e.subject.fromNode.updateTargetBindings();
-//   // e.subject.toNode.updateTargetBindings();
-//   console.log("🚀 ~ e.subject.fromNode:", e.subject.fromNode);
-//   console.log("🚀 ~ e.subject.toNode:", e.subject.toNode);
-// });
 
 diagram.addDiagramListener("LinkRelinked", function (e) {
-  console.log("🚀 ~ e:", e)
-  // e.subject.fromNode.updateTargetBindings();
-  // e.subject.toNode.updateTargetBindings();
-  console.log("🚀 ~ LinkRelinked e.subject.fromNode:", e.subject.fromNode);
-  console.log("🚀 ~ LinkRelinked e.subject.toNode:", e.subject.toNode);
+  const link = e.subject.part;
+  if (link instanceof go.Link) {
+    const newToNode = link.toNode;
+    const isMonitor = newToNode.data?.category == "monitor";
+    if (isMonitor) {
+      diagram.model.startTransaction(`update connected`);
+      diagram.model.setDataProperty(newToNode.data, "connected", true);
+      diagram.model.commitTransaction(`update connected`);
+    }
+  }
 });
 
-diagram.addDiagramListener("SelectionDeleted", function (e) {
-  console.log(e.subject.toNode);
-  e.subject.each((part) => {
-    if (part instanceof go.Link) {
-      console.log("Đã xoá link:", part.data);
-    }
-  });
-});
+const myRelinkingTool = new go.RelinkingTool();
+myRelinkingTool.reconnectLink = function (
+  existingLink,
+  fromNode,
+  fromPort,
+  toNode,
+  toPort,
+  isFrom
+) {
+  const oldTo = existingLink.toNode;
+  const isMonitor = oldTo.data?.category == "monitor";
+  if (isMonitor) {
+    diagram.model.startTransaction(`update connected`);
+    diagram.model.setDataProperty(oldTo.data, "connected", false);
+    diagram.model.commitTransaction(`update connected`);
+  }
+
+  go.RelinkingTool.prototype.reconnectLink.call(
+    this,
+    existingLink,
+    fromNode,
+    fromPort,
+    toNode,
+    toPort,
+    isFrom
+  );
+};
+diagram.toolManager.relinkingTool = myRelinkingTool;
+
 diagram.model.addChangedListener(function (evt) {
   if (evt.propertyName === "linkDataArray") {
-
     const deletedLink = evt?.oldValue;
     const link = evt.newValue;
     const toKey =
