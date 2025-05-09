@@ -1,184 +1,20 @@
+import { colors } from "../../core/constants/common.js";
+import { tank2, tank3, valve1 } from "../../core/constants/geometrics.js";
+import {
+  monitorTemplate,
+  tankTemplate,
+  valveTemplate,
+} from "../../core/constants/scadaNodeTemplate.js";
 import { toHeight, toWidth } from "../../core/utils/common.js";
 import { Diagram } from "../../modules/diagram.js";
 import { Palette } from "../../modules/palette.js";
+import { SCADASheet } from "../../modules/scada.js";
 import { Sheet } from "../../modules/sheets.js";
 
 // Bảng thiết bị: (Thiết bị, Cảm Biến)
 // Bảng dữ liệu đo lường
 // Bảng sự kiện
 // Bảng cấu hình
-
-const colors = {
-  black: "#151c26",
-  white: "#ffffff",
-  gray: "#2c323b",
-  green: "#7ba961",
-  blue: "#00a9b0",
-  pink: "#e483a2",
-  yellow: "#f9c66a",
-  orange: "#e48042",
-  red: "#ed2d44",
-  transparent: "transparent",
-};
-
-const tank1 = "F M0 0 H50 V-100 H0z";
-// const tank2 = "F M0 0 Q25 -25 50 0 V87.5 H0z";
-const tank2 = "F M 0 100 L 0 25 A 25 25 0 0 1 50 25 L 50 100 z";
-const tank3 = "F M0 100 L0 25 L25 0 50 25 V100z ";
-
-//valve
-const valve1 = "F M0 0 L50 25 50 0 0 25z M25 12.5 L25 -12 M12.5 -12 H36";
-
-const tankPort = new go.Panel({
-  fromLinkable: true,
-  toLinkable: true,
-  toMaxLinks: 1,
-})
-  .bind("alignment", "a")
-  .bind("portId", "p")
-  .bind("fromSpot", "fs")
-  .bind("toSpot", "ts")
-  .add(new go.Shape("Diamond", { width: 10, height: 10, fill: colors.white }));
-
-const tankTemplate = new go.Node("Spot", {
-  itemTemplate: tankPort,
-  resizable: true,
-  resizeObjectName: "Main",
-})
-  .bind("itemArray", "ports")
-  .add(
-    new go.Panel("Spot", {
-      strokeWidth: 2,
-      clip: true,
-    }).add(
-      new go.Shape({
-        name: "Main",
-
-        geometryString: tank1,
-        stroke: colors.black,
-        fill: new go.Brush("Linear", {
-          0: go.Brush.darken(colors.white),
-          0.2: colors.white,
-          0.33: go.Brush.lighten(colors.white),
-          0.5: colors.white,
-          1: go.Brush.darken(colors.white),
-          start: go.Spot.Left,
-          end: go.Spot.Right,
-        }),
-      }).bind("geometryString", "tankType"),
-
-      new go.TextBlock({ stroke: colors.black, wrap: go.Wrap.Fit })
-        .bind("text", "label")
-        .bind("width", "", toWidth)
-        .bind("height", "", toHeight)
-    )
-  );
-
-const monitorTemplate = new go.Node("Auto", {
-  resizable: true,
-  minSize: new go.Size(100, 40),
-}).add(
-  new go.Shape({
-    fill: "transparent",
-    strokeWidth: 2,
-    stroke: colors.white,
-    toLinkable: true,
-    portId: "monitor",
-  }),
-  new go.Panel("Vertical", {
-    margin: 10,
-    stretch: go.Stretch.Fill,
-    stroke: colors.black,
-    strokeWidth: 2,
-    cursor: "move",
-  }).add(
-    new go.TextBlock().bind("text", "label"),
-    new go.Panel("Horizontal").add(
-      new go.Shape("Circle", { width: 8, height: 8 }).bind(
-        "fill",
-        "",
-        (data, node) => {
-          return data.connected ? colors.green : colors.red;
-        }
-      )
-    ),
-    new go.Panel("Table", {
-      // defaultRowSeparatorStroke: colors.black,
-      // defaultColumnSeparatorStroke: colors.black,
-      stretch: go.Stretch.Fill,
-      itemTemplate: new go.Panel("TableRow").add(
-        new go.TextBlock({
-          row: 0,
-          column: 0,
-          margin: 2,
-          textAlign: "left",
-          stretch: go.Stretch.Fill,
-        }).bind("text", "label"),
-        new go.TextBlock({
-          row: 0,
-          column: 1,
-          margin: 2,
-          textAlign: "left",
-          overflow: go.TextOverflow.Ellipsis,
-          stretch: go.Stretch.Fill,
-        }).bind("text", "value"),
-        new go.TextBlock({
-          row: 0,
-          column: 2,
-          margin: 2,
-          textAlign: "right",
-          overflow: go.TextOverflow.Ellipsis,
-          stretch: go.Stretch.Fill,
-        }).bind("text", "unit")
-      ),
-    }).bind("itemArray", "parameters")
-  )
-);
-
-const valveTemplate = new go.Node("Spot", {
-  resizable: true,
-  rotatable: true,
-  resizeObjectName: "Main",
-}).add(
-  new go.Shape({
-    name: "Main",
-    geometryString: valve1,
-    stroke: colors.red,
-    fill: colors.gray,
-    cursor: "move",
-  })
-    .bind("fill")
-    .bind("stroke")
-    .bind("geometryString", "valveType"),
-
-  new go.Shape("Circle", {
-    portId: "monitor",
-    fromLinkable: true,
-    with: 5,
-    height: 5,
-    alignment: new go.Spot(0.5, 0.65),
-    fill: colors.transparent,
-    stroke: colors.transparent,
-  }),
-  new go.Shape("Circle", {
-    portId: "valve-input",
-    toLinkable: true,
-    with: 5,
-    height: 5,
-    alignment: new go.Spot(0, 0.65, 3, 0),
-    fill: colors.transparent,
-    stroke: colors.transparent,
-  }),
-  new go.Shape("Circle", {
-    portId: "valve-output",
-    fromLinkable: true,
-    with: 5,
-    height: 5,
-    alignment: new go.Spot(1, 0.65, -3, 0),
-    fill: colors.transparent,
-    stroke: colors.transparent,
-  })
-);
 
 const portColor = {
   BR1: colors.green,
@@ -263,8 +99,6 @@ const paletteData = [
   },
 ];
 
-console.log(paletteData);
-
 const palette = new Palette({
   paletteDivId: "palette",
   // nodeTemplate: nodeTemplate,
@@ -314,7 +148,7 @@ const linkTemplate = new go.Link({
     //   .bind("fill", "fromPort", (fromPort) => portColor[fromPort] || "black")
   );
 
-const sheetManager = new Sheet({
+const sheetManager = new SCADASheet({
   diagramContainerId: "diagram",
   sheetListContainerId: "sheetList",
   nodeTemplateMap: nodeTemplateMap,
@@ -324,52 +158,6 @@ const sheetManager = new Sheet({
 window.exportAllJson = () => sheetManager.exportAllJson();
 
 const diagram = sheetManager.diagram;
-
-// diagram.linkTemplate = new go.Link({
-//   relinkableFrom: true,
-//   relinkableTo: true,
-//   routing: go.Routing.AvoidsNodes,
-//   corner: 10, // rounded corners
-//   layerName: "Background",
-//   toShortLength: 8,
-//   fromEndSegmentLength: 4,
-//   toEndSegmentLength: 30,
-// })
-//   .bind("fromEndSegmentLength")
-//   .bind("toEndSegmentLength")
-//   .add(
-//     new go.Shape({ strokeWidth: 8, stroke: colors.black, isPanelMain: true }),
-//     new go.Shape({
-//       strokeWidth: 3.5,
-//       stroke: colors.green,
-//       isPanelMain: true,
-//     }).bind(
-//       "stroke",
-//       "fromPort",
-//       (fromPort) => portColor[fromPort] || colors.blue
-//     ),
-//     new go.Shape({
-//       fill: colors.green,
-//       toArrow: "Triangle",
-//       scale: 1.4,
-//       stroke: colors.black,
-//     })
-//       // .bind("stroke", "fromPort", (fromPort) => portColor[fromPort] || colors.black)
-//       .bind(
-//         "fill",
-//         "fromPort",
-//         (fromPort) => portColor[fromPort] || colors.blue
-//       )
-
-//     // new go.Shape({ strokeWidth: 4 }).bind(
-//     //   "stroke",
-//     //   "fromPort",
-//     //   (fromPort) => portColor[fromPort] || "black"
-//     // ),
-//     // new go.Shape({ toArrow: "Standard" })
-//     //   .bind("stroke", "fromPort", (fromPort) => portColor[fromPort] || "black")
-//     //   .bind("fill", "fromPort", (fromPort) => portColor[fromPort] || "black")
-//   );
 
 const linkDataArray = [
   { from: "Tank1", to: "Tank2", fromPort: "BR1", toPort: "BL3" },
@@ -381,7 +169,6 @@ diagram.model = new go.GraphLinksModel({
   linkToPortIdProperty: "toPort", // identifies data property names
   linkDataArray: linkDataArray,
 });
-
 
 diagram.addDiagramListener("LinkRelinked", function (e) {
   const link = e.subject.part;
@@ -437,4 +224,65 @@ diagram.model.addChangedListener(function (evt) {
     toNodeData.connected = isConnected;
     diagram.model.updateTargetBindings(toNodeData);
   }
+});
+
+function findNodesByCategory(category) {
+  const nodes = [];
+
+  diagram.nodes.each((node) => {
+    if (node.data?.category === category) {
+      nodes.push(node);
+    }
+  });
+
+  return nodes;
+}
+
+const socket = io("http://localhost:3000");
+
+socket.on("message", function (msg) {
+  console.log(msg);
+  diagram.commit(() => {
+    const monitors = findNodesByCategory("monitor");
+    for (const n of monitors) {
+      const d = n.data;
+      if (d.connected) {
+        diagram.model.set(d, "parameters", [
+          {
+            label: "T",
+            value: msg.t,
+            unit: "°C",
+          },
+          {
+            label: "P",
+            value: msg.p,
+            unit: "atm",
+          },
+          {
+            label: "Q",
+            value: msg.q,
+            unit: "m³/s",
+          },
+        ]);
+      } else {
+        diagram.model.set(d, "parameters", [
+          {
+            label: "T",
+            value: "0",
+            unit: "°C",
+          },
+          {
+            label: "P",
+            value: "1",
+            unit: "atm",
+          },
+          {
+            label: "Q",
+            value: "1",
+            unit: "m³/s",
+          },
+        ]);
+      }
+    }
+  }, null);
 });
