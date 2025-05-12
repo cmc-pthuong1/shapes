@@ -4,15 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Example</title>
-    <link rel="stylesheet" href="styles/app.css" />
+    <link rel="stylesheet" href="../../styles/app.css" />
+    <link rel="stylesheet" href="../sheets/sheets.css" />
   </head>
 
   <body>
     <script src="https://cdn.jsdelivr.net/npm/gojs@3.0.21/release/go.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/create-gojs-kit@3.0.21/dist/extensions/Figures.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 
     <div class="app">
       <div class="palette">
+        <div id="imageInserter"></div>
         <h1 class="title">Shapes</h1>
         <div id="palette"></div>
       </div>
@@ -22,7 +25,13 @@
         <div id="inspector" class="inspector"></div>
       </div>
     </div>
+    <div class="bottomBar">
+      <div class="sheets" id="sheetList"></div>
+      <div class="right-actions">
+        <button class="export-btn" onclick="exportAllJson()">Export</button>
+      </div>
+    </div>
+    <script type="module" src="/pages/map-template/mapTemplate.js"></script>
     <script src="app.js"></script>
-    <script type="module" src="pages/home/home.js"></script>
   </body>
 </html>
