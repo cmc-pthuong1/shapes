@@ -38,10 +38,10 @@ export const tankTemplate = new go.Node("Spot", {
           start: go.Spot.Left,
           end: go.Spot.Right,
         }),
-      }).bind("geometryString", "tankType"),
+      }).bind("geometryString", "geometryString"),
 
       new go.TextBlock({ stroke: colors.black, wrap: go.Wrap.Fit })
-        .bind("text", "label")
+        .bind("text", "name")
         .bind("width", "", toWidth)
         .bind("height", "", toHeight)
     )
@@ -65,7 +65,7 @@ export const monitorTemplate = new go.Node("Auto", {
     strokeWidth: 2,
     cursor: "move",
   }).add(
-    new go.TextBlock().bind("text", "label"),
+    new go.TextBlock().bind("text", "name"),
     new go.Panel("Horizontal").add(
       new go.Shape("Circle", { width: 8, height: 8 }).bind(
         "fill",
@@ -76,35 +76,43 @@ export const monitorTemplate = new go.Node("Auto", {
       )
     ),
     new go.Panel("Table", {
-      // defaultRowSeparatorStroke: colors.black,
-      // defaultColumnSeparatorStroke: colors.black,
       stretch: go.Stretch.Fill,
-      itemTemplate: new go.Panel("TableRow").add(
-        new go.TextBlock({
-          row: 0,
-          column: 0,
-          margin: 2,
-          textAlign: "left",
-          stretch: go.Stretch.Fill,
-        }).bind("text", "label"),
-        new go.TextBlock({
-          row: 0,
-          column: 1,
-          margin: 2,
-          textAlign: "left",
-          overflow: go.TextOverflow.Ellipsis,
-          stretch: go.Stretch.Fill,
-        }).bind("text", "value"),
-        new go.TextBlock({
-          row: 0,
-          column: 2,
-          margin: 2,
-          textAlign: "right",
-          overflow: go.TextOverflow.Ellipsis,
-          stretch: go.Stretch.Fill,
-        }).bind("text", "unit")
-      ),
-    }).bind("itemArray", "parameters")
+    }).add(
+      //row1
+      new go.TextBlock("Q", {
+        row: 0,
+        column: 0,
+        margin: 2,
+      }),
+      new go.TextBlock({
+        row: 0,
+        column: 1,
+        margin: 2,
+      }).bind("text", "", (data) => data.properties.flowRate),
+
+      new go.TextBlock("m³/s", {
+        row: 0,
+        column: 2,
+        margin: 2,
+      }),
+      //row 2
+      new go.TextBlock("P", {
+        row: 1,
+        column: 0,
+        margin: 2,
+      }),
+      new go.TextBlock({
+        row: 1,
+        column: 1,
+        margin: 2,
+      }).bind("text", "", (data) => data.properties.pressure),
+
+      new go.TextBlock("atm", {
+        row: 1,
+        column: 2,
+        margin: 2,
+      })
+    )
   )
 );
 
@@ -116,13 +124,14 @@ export const valveTemplate = new go.Node("Spot", {
   new go.Shape({
     name: "Main",
     geometryString: valve1,
-    stroke: colors.red,
-    fill: colors.gray,
+    stroke: colors.gray,
+    fill: colors.white,
     cursor: "move",
   })
-    .bind("fill")
-    .bind("stroke")
-    .bind("geometryString", "valveType"),
+    .bind("fill", "", (data) =>
+      data.properties.isOpen ? colors.white : colors.red
+    )
+    .bind("geometryString", "geometryString"),
 
   new go.Shape("Circle", {
     portId: "monitor",

@@ -1,5 +1,10 @@
 import { colors } from "../../core/constants/common.js";
-import { tank2, tank3, valve1 } from "../../core/constants/geometrics.js";
+import {
+  tank1,
+  tank2,
+  tank3,
+  valve1,
+} from "../../core/constants/geometrics.js";
 import {
   monitorTemplate,
   tankTemplate,
@@ -31,71 +36,104 @@ const nodeTemplateMap = {
 const paletteData = [
   {
     category: "tank",
-    key: "Tank1",
-    label: "Tank 1",
+    type: "tank1",
+    name: "MPAT",
     color: "gray",
+    status: "active",
+    geometryString: tank1,
     ports: [
-      { p: "BR1", a: new go.Spot(1, 0.5), fs: go.Spot.Right },
-      { p: "BR2", a: new go.Spot(1, 0.7), fs: go.Spot.Right },
-      { p: "BR3", a: new go.Spot(1, 0.9), fs: go.Spot.Right },
+      {
+        p: "BR1",
+        a: new go.Spot(1, 0.1),
+        fs: go.Spot.Right,
+        ts: go.Spot.Right,
+      },
+      {
+        p: "BR2",
+        a: new go.Spot(1, 0.35),
+        fs: go.Spot.Right,
+        ts: go.Spot.Right,
+      },
+      {
+        p: "BR3",
+        a: new go.Spot(1, 0.6),
+        fs: go.Spot.Right,
+        ts: go.Spot.Right,
+      },
+    ],
+    properties: {},
+  },
+  {
+    category: "tank",
+    type: "tank2",
+    name: "MPHE",
+    geometryString: tank2,
+    ports: [
+      { p: "BL1", a: new go.Spot(0, 0.5), fs: go.Spot.Left, ts: go.Spot.Left },
+      {
+        p: "BL2",
+        a: new go.Spot(0, 1, 0, -30),
+        fs: go.Spot.Left,
+        ts: go.Spot.Left,
+      },
+      // { p: "BL3", a: new go.Spot(0, 0.5) },
+      {
+        p: "BR1",
+        a: new go.Spot(1, 0.7),
+        fs: go.Spot.Right,
+        ts: go.Spot.Right,
+      },
+      {
+        p: "BR2",
+        a: new go.Spot(1, 0.9),
+        fs: go.Spot.Right,
+        ts: go.Spot.Right,
+      },
     ],
   },
   {
     category: "tank",
-    tankType: tank2,
-    key: "Tank2",
-    label: "Tank 2",
-    color: "gray",
+    type: "tank3",
+    name: "MHTW",
+    geometryString: tank3,
     ports: [
-      { p: "BL1", a: new go.Spot(0, 0.5), ts: go.Spot.Left },
-      //   { p: "BL2", a: new go.Spot(0, 1, 0, -30) },
-      // { p: "BL3", a: new go.Spot(0, 0.5) },
-      { p: "BR1", a: new go.Spot(1, 0.7), ts: go.Spot.Right },
-      { p: "BR2", a: new go.Spot(1, 0.9), ts: go.Spot.Right },
-    ],
-  },
-  {
-    category: "tank",
-    tankType: tank3,
-    key: "Tank3",
-    label: "Tank 3",
-    color: "gray",
-    ports: [
-      { p: "BL1", a: new go.Spot(0, 0.5), ts: go.Spot.Left },
-      //   { p: "BL2", a: new go.Spot(0, 1, 0, -30) },
-      // { p: "BL3", a: new go.Spot(0, 0.5) },
-      { p: "BR1", a: new go.Spot(1, 0.7), ts: go.Spot.Right },
-      { p: "BR2", a: new go.Spot(1, 0.9), ts: go.Spot.Right },
+      { p: "BL3", a: new go.Spot(0, 0.45), ts: go.Spot.Left, fs: go.Spot.Left },
+      { p: "BL2", a: new go.Spot(0, 0.6), ts: go.Spot.Left, fs: go.Spot.Left },
+      { p: "BL1", a: new go.Spot(0, 0.75), ts: go.Spot.Left, fs: go.Spot.Left },
+
+      {
+        p: "BR1",
+        a: new go.Spot(1, 0.7),
+        fs: go.Spot.Right,
+        ts: go.Spot.Right,
+      },
+      {
+        p: "BR2",
+        a: new go.Spot(1, 0.9),
+        fs: go.Spot.Right,
+        ts: go.Spot.Right,
+      },
     ],
   },
   {
     category: "monitor",
-    label: "monitor",
-    connected: false,
-    parameters: [
-      {
-        label: "T",
-        value: "0",
-        unit: "°C",
-      },
-      {
-        label: "P",
-        value: "1",
-        unit: "atm",
-      },
-      {
-        label: "Q",
-        value: "1",
-        unit: "m³/s",
-      },
-    ],
+    name: "monitor TVC102",
+    properties: {
+      flowRate: "0",
+      pressure: "1",
+      isOpen: 0,
+    },
   },
   {
-    category: "valve",
-    valveType: valve1,
-    fill: colors.white,
-    stroke: colors.gray,
+    category:"valve",
+    name: "LCV101",
+    geometryString: valve1,
     ports: { p: "BL1", a: new go.Spot(0, 0.5), ts: go.Spot.Left },
+    properties: {
+      flowRate: "0",
+      pressure: "1",
+      isOpen: 0,
+    },
   },
 ];
 
