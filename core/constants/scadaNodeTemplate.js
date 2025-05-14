@@ -71,7 +71,7 @@ export const monitorTemplate = new go.Node("Auto", {
         "fill",
         "",
         (data, node) => {
-          return data.connected ? colors.green : colors.red;
+          return data.properties.connected ? colors.green : colors.red;
         }
       )
     ),

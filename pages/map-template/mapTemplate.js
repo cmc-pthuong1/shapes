@@ -1,4 +1,4 @@
-import { colors } from "../../core/constants/common.js";
+import { colors, defaultPropertiesMonitor } from "../../core/constants/common.js";
 import {
   tank1,
   tank2,
@@ -119,13 +119,11 @@ const paletteData = [
     category: "monitor",
     name: "monitor TVC102",
     properties: {
-      flowRate: "0",
-      pressure: "1",
-      isOpen: 0,
+      ...defaultPropertiesMonitor,
     },
   },
   {
-    category:"valve",
+    category: "valve",
     name: "LCV101",
     geometryString: valve1,
     ports: { p: "BL1", a: new go.Spot(0, 0.5), ts: go.Spot.Left },
@@ -194,6 +192,7 @@ const sheetManager = new SCADASheet({
 });
 
 window.exportAllJson = () => sheetManager.exportAllJson();
+window.importJson = (e) => sheetManager.importJson(e);
 
 const diagram = sheetManager.diagram;
 
@@ -208,62 +207,95 @@ diagram.model = new go.GraphLinksModel({
   linkDataArray: linkDataArray,
 });
 
-diagram.addDiagramListener("LinkRelinked", function (e) {
-  const link = e.subject.part;
-  if (link instanceof go.Link) {
-    const newToNode = link.toNode;
-    const isMonitor = newToNode.data?.category == "monitor";
-    if (isMonitor) {
-      diagram.model.startTransaction(`update connected`);
-      diagram.model.setDataProperty(newToNode.data, "connected", true);
-      diagram.model.commitTransaction(`update connected`);
+function trackingLinked() {
+  diagram.model.addChangedListener(function (evt) {
+    if (evt.propertyName === "linkDataArray") {
+      const deletedLink = evt?.oldValue;
+      const link = evt.newValue;
+      const toKey =
+        evt.change === go.ChangedEvent.Remove ? deletedLink.to : link.to;
+
+      const toNodeData = diagram.model.findNodeDataForKey(toKey);
+      if (toNodeData.category == "monitor") {
+        let isConnected = evt.change != go.ChangedEvent.Remove;
+
+        toNodeData.properties = isConnected
+          ? {
+              ...toNodeData.properties,
+              connected: true,
+            }
+          : defaultPropertiesMonitor;
+        diagram.model.updateTargetBindings(toNodeData);
+        if (isConnected) {
+          //emit registerDevice
+          socket.emit("registerDevice", {
+            deviceId: toNodeData.key,
+            status: "active",
+          });
+        } else {
+          socket.emit("disconnectDevice", {
+            deviceId: toNodeData.key,
+          });
+        }
+      }
     }
-  }
-});
+  });
+}
 
-const myRelinkingTool = new go.RelinkingTool();
-myRelinkingTool.reconnectLink = function (
-  existingLink,
-  fromNode,
-  fromPort,
-  toNode,
-  toPort,
-  isFrom
-) {
-  const oldTo = existingLink.toNode;
-  const isMonitor = oldTo.data?.category == "monitor";
-  if (isMonitor) {
-    diagram.model.startTransaction(`update connected`);
-    diagram.model.setDataProperty(oldTo.data, "connected", false);
-    diagram.model.commitTransaction(`update connected`);
-  }
+function trackingReLink() {
+  diagram.addDiagramListener("LinkRelinked", function (e) {
+    const link = e.subject.part;
+    if (link instanceof go.Link) {
+      const newToNode = link.toNode;
+      const isMonitor = newToNode.data?.category == "monitor";
+      if (isMonitor) {
+        console.log(newToNode.data);
+        const properties = { ...newToNode.data, connected: true };
+        diagram.model.setDataProperty(newToNode.data, "properties", properties);
+        // emit registerDevice
+        socket.emit("registerDevice", {
+          deviceId: newToNode.key,
+          statusConnect: true,
+        });
+      }
+    }
+  });
+  const myRelinkingTool = new go.RelinkingTool();
 
-  go.RelinkingTool.prototype.reconnectLink.call(
-    this,
+  myRelinkingTool.reconnectLink = function (
     existingLink,
     fromNode,
     fromPort,
     toNode,
     toPort,
     isFrom
-  );
-};
-diagram.toolManager.relinkingTool = myRelinkingTool;
+  ) {
+    const oldTo = existingLink.toNode;
+    const isMonitor = oldTo.data?.category == "monitor";
+    if (isMonitor) {
+      console.log(oldTo.data);
+      diagram.model.setDataProperty(oldTo.data, "properties", defaultPropertiesMonitor);
+      //emit disconnectDevice
+      socket.emit("disconnectDevice", {
+        deviceId: oldTo.key,
+      });
+    }
 
-diagram.model.addChangedListener(function (evt) {
-  if (evt.propertyName === "linkDataArray") {
-    const deletedLink = evt?.oldValue;
-    const link = evt.newValue;
-    const toKey =
-      evt.change === go.ChangedEvent.Remove ? deletedLink.to : link.to;
+    go.RelinkingTool.prototype.reconnectLink.call(
+      this,
+      existingLink,
+      fromNode,
+      fromPort,
+      toNode,
+      toPort,
+      isFrom
+    );
+  };
+  diagram.toolManager.relinkingTool = myRelinkingTool;
+}
 
-    const toNodeData = diagram.model.findNodeDataForKey(toKey);
-    let isConnected = evt.change != go.ChangedEvent.Remove;
-    toNodeData.connected = isConnected;
-    diagram.model.updateTargetBindings(toNodeData);
-  }
-});
-
+trackingLinked();
+trackingReLink();
 function findNodesByCategory(category) {
   const nodes = [];
 
@@ -277,50 +309,19 @@ function findNodesByCategory(category) {
 }
 
 const socket = io("http://localhost:3000");
+socket.on("event", function (msg) {
+  console.log("🚀 ~ msg:", msg)
+  if (msg.event == "pushData") {
+    const key = msg.deviceId;
+    if (!key) return;
+    const toNodeData = diagram.model.findNodeDataForKey(Number(key));
+    if (!toNodeData) return;
 
-socket.on("message", function (msg) {
-  console.log(msg);
-  diagram.commit(() => {
-    const monitors = findNodesByCategory("monitor");
-    for (const n of monitors) {
-      const d = n.data;
-      if (d.connected) {
-        diagram.model.set(d, "parameters", [
-          {
-            label: "T",
-            value: msg.t,
-            unit: "°C",
-          },
-          {
-            label: "P",
-            value: msg.p,
-            unit: "atm",
-          },
-          {
-            label: "Q",
-            value: msg.q,
-            unit: "m³/s",
-          },
-        ]);
-      } else {
-        diagram.model.set(d, "parameters", [
-          {
-            label: "T",
-            value: "0",
-            unit: "°C",
-          },
-          {
-            label: "P",
-            value: "1",
-            unit: "atm",
-          },
-          {
-            label: "Q",
-            value: "1",
-            unit: "m³/s",
-          },
-        ]);
-      }
-    }
-  }, null);
+    const properties = {
+      ...toNodeData.properties,
+      flowRate: msg.flowRate,
+      pressure: msg.pressure,
+    };
+    diagram.model.set(toNodeData, "properties", properties);
+  }
 });
