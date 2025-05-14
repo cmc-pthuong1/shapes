@@ -1,4 +1,4 @@
-export const fontDefault = "normal 600 10pt sans-serif"
+export const fontDefault = "normal 600 10pt sans-serif";
 export const colors = {
   black: "#151c26",
   white: "#ffffff",
@@ -10,4 +10,9 @@ export const colors = {
   orange: "#e48042",
   red: "#ed2d44",
   transparent: "transparent",
+};
+
+export const textDefaults = {
+  font: "10px InterVariable, sans-serif",
+  stroke: colors.white,
 };
