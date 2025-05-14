@@ -192,6 +192,7 @@ const sheetManager = new SCADASheet({
 });
 
 window.exportAllJson = () => sheetManager.exportAllJson();
+window.importJson = (e) => sheetManager.importJson(e);
 
 const diagram = sheetManager.diagram;
 
