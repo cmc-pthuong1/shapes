@@ -1,24 +1,26 @@
 import { Diagram } from "./diagram.js";
 import { ImageInserter } from "./imageInserter.js";
 import { Inspector } from "./inspector.js";
+import { SCADADiagram } from "./scadaDiagram.js";
 
 export class SCADASheet {
   constructor({
     diagramContainerId,
     sheetListContainerId,
     nodeTemplate = null,
-    nodeTemplateMap ,
-    linkTemplate
+    nodeTemplateMap,
+    linkTemplate,
   }) {
     this.diagramContainerId = diagramContainerId;
     this.sheetListContainer = document.getElementById(sheetListContainerId);
     this.nodeTemplate = nodeTemplate; // Hàm cấu hình nodeTemplate, linkTemplate nếu có
-    this.nodeTemplateMap = nodeTemplateMap
-    this.linkTemplate = linkTemplate
+    this.nodeTemplateMap = nodeTemplateMap;
+    this.linkTemplate = linkTemplate;
     this.sheetModels = {}; // { [name]: {model, position} }
     this.currentSheet = null;
     this.sheetCount = 0;
     this.diagram = null;
+    this.diagramControl = null;
     this.sheetList = null;
     this.inspector = null;
     this.initUI();
@@ -68,7 +70,9 @@ export class SCADASheet {
     this.currentSheet = sheetName;
 
     // Tạo Diagram mới
-    const newDiagram = this.innitDiagram(this.sheetModels?.[sheetName] || {});
+    const newDiagram = this.innitDiagram({
+      model: this.sheetModels?.[sheetName] || {},
+    });
 
     this.diagram = newDiagram;
     // this.diagram.commandHandler.groupSelection();
@@ -92,13 +96,14 @@ export class SCADASheet {
   }
 
   innitDiagram({ model = null, position = null }) {
-    const newDiagramControl = new Diagram({
+    const newDiagramControl = new SCADADiagram({
       diagramDivId: this.diagramContainerId,
       jsonModel: model,
       nodeTemplate: this.nodeTemplate,
       nodeTemplateMap: this.nodeTemplateMap,
-      linkTemplate: this.linkTemplate
+      linkTemplate: this.linkTemplate,
     });
+    this.diagramControl = newDiagramControl
     const newDiagram = newDiagramControl.diagram;
     if (position) {
       newDiagram.addDiagramListener("InitialLayoutCompleted", () => {
@@ -122,8 +127,21 @@ export class SCADASheet {
         position: go.Point.stringify(this.diagram.position),
       },
     };
-    console.log("🚀 ~ Sheet ~ exportAllJson ~ data:", data)
-    const jsonData = JSON.stringify(data);
+    console.log("🚀 ~ SCADASheet ~ exportAllJson ~ data:", data);
+    const dataSubmit = {};
+
+    for (const sheet in data) {
+      const dataDiagram = JSON.parse(data[sheet].model);
+      const devices = dataDiagram?.nodeDataArray;
+      const connections = dataDiagram?.linkDataArray;
+      dataSubmit[sheet] = {
+        devices,
+        connections,
+      };
+    }
+
+    const jsonData = JSON.stringify(dataSubmit);
+    console.log("🚀 ~ SCADASheet ~ exportAllJson ~ jsonData:", jsonData);
     const blob = new Blob([jsonData], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -132,6 +150,56 @@ export class SCADASheet {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  }
+
+  importJson(event) {
+    const input = event.target;
+    if (input.files.length > 0) {
+      const file = input.files[0];
+
+      // Kiểm tra xem file có phải là JSON không
+      if (file.type !== "application/json") {
+        console.error("Vui lòng chọn file JSON.");
+        return;
+      }
+
+      const reader = new FileReader();
+
+      // Khi hoàn thành việc đọc file
+      reader.onload = (e) => {
+        try {
+          const jsonData = JSON.parse(e.target.result); // Chuyển đổi chuỗi JSON thành object
+          console.log("Dữ liệu JSON:", jsonData);
+
+          this.convertDataToSheet(jsonData);
+        } catch (error) {
+          console.error("Lỗi khi phân tích JSON:", error);
+        }
+      };
+
+      // Đọc file dưới dạng văn bản
+      reader.readAsText(file);
+    } else {
+      console.log("Không có file nào được chọn.");
+    }
+  }
+
+  convertDataToSheet(jsonData) {
+    const data = {};
+    for (const sheet in jsonData) {
+      data[sheet] = JSON.stringify({
+        class: "GraphLinksModel",
+        linkFromPortIdProperty: "fromPort",
+        linkToPortIdProperty: "toPort",
+        nodeDataArray: jsonData[sheet].devices,
+        linkDataArray: jsonData[sheet].connections,
+      });
+    }
+    this.sheetModels = data;
+
+    this.currentSheet = null;
+
+    this.switchSheet(Object.keys(jsonData)[0]);
   }
 
   getCurrentDiagram() {
@@ -144,3 +212,5 @@ export class SCADASheet {
     return this.sheetModels;
   }
 }
+
+// C:\DATA-PTHUONG1\DKR\shapes\pages\map-template

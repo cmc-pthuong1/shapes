@@ -1,4 +1,4 @@
-import { colors } from "../../core/constants/common.js";
+import { colors, defaultPropertiesMonitor } from "../../core/constants/common.js";
 import {
   tank1,
   tank2,
@@ -124,9 +124,7 @@ const paletteData = [
     category: "monitor",
     name: "monitor TVC102",
     properties: {
-      flowRate: "0",
-      pressure: "1",
-      isOpen: 0,
+      ...defaultPropertiesMonitor,
     },
   },
   {
@@ -186,28 +184,13 @@ const linkTemplate = new go.Link({
       strokeWidth: 3.5,
       stroke: colors.green,
       isPanelMain: true,
-    }).bind("stroke", "", (data, node) => {
-      if (data.toPort == "monitor") return portColor[data.toPort];
-      return portColor[data.fromPort] || colors.blue;
     }),
     new go.Shape({
       fill: colors.green,
       toArrow: "Triangle",
       scale: 1.4,
       stroke: colors.black,
-    }).bind("stroke", "", (data, node) => {
-      if (data.toPort == "monitor") return portColor[data.toPort];
-      return portColor[data.fromPort] || colors.blue;
     })
-
-    // new go.Shape({ strokeWidth: 4 }).bind(
-    //   "stroke",
-    //   "fromPort",
-    //   (fromPort) => portColor[fromPort] || "black"
-    // ),
-    // new go.Shape({ toArrow: "Standard" })
-    //   .bind("stroke", "fromPort", (fromPort) => portColor[fromPort] || "black")
-    //   .bind("fill", "fromPort", (fromPort) => portColor[fromPort] || "black")
   );
 
 const sheetManager = new SCADASheet({
@@ -218,133 +201,14 @@ const sheetManager = new SCADASheet({
 });
 
 window.exportAllJson = () => sheetManager.exportAllJson();
+window.importJson = (e) => sheetManager.importJson(e);
 
 const diagram = sheetManager.diagram;
-
-const linkDataArray = [
-  { from: "Tank1", to: "Tank2", fromPort: "BR1", toPort: "BL3" },
-  //   { from: "Tank1", to: "Tank2", fromPort: "BR3", toPort: "BL2" },
-];
 
 diagram.model = new go.GraphLinksModel({
   linkFromPortIdProperty: "fromPort", // required information:
   linkToPortIdProperty: "toPort", // identifies data property names
-  linkDataArray: linkDataArray,
 });
-
-diagram.addDiagramListener("LinkRelinked", function (e) {
-  const link = e.subject.part;
-  if (link instanceof go.Link) {
-    const newToNode = link.toNode;
-    const isMonitor = newToNode.data?.category == "monitor";
-    if (isMonitor) {
-      diagram.model.startTransaction(`update connected`);
-      diagram.model.setDataProperty(newToNode.data, "connected", true);
-      diagram.model.commitTransaction(`update connected`);
-    }
-  }
-});
-
-const myRelinkingTool = new go.RelinkingTool();
-myRelinkingTool.reconnectLink = function (
-  existingLink,
-  fromNode,
-  fromPort,
-  toNode,
-  toPort,
-  isFrom
-) {
-  const oldTo = existingLink.toNode;
-  const isMonitor = oldTo.data?.category == "monitor";
-  if (isMonitor) {
-    diagram.model.startTransaction(`update connected`);
-    diagram.model.setDataProperty(oldTo.data, "connected", false);
-    diagram.model.commitTransaction(`update connected`);
-  }
-
-  go.RelinkingTool.prototype.reconnectLink.call(
-    this,
-    existingLink,
-    fromNode,
-    fromPort,
-    toNode,
-    toPort,
-    isFrom
-  );
-};
-diagram.toolManager.relinkingTool = myRelinkingTool;
-
-diagram.model.addChangedListener(function (evt) {
-  if (evt.propertyName === "linkDataArray") {
-    const deletedLink = evt?.oldValue;
-    const link = evt.newValue;
-    const toKey =
-      evt.change === go.ChangedEvent.Remove ? deletedLink.to : link.to;
-
-    const toNodeData = diagram.model.findNodeDataForKey(toKey);
-    let isConnected = evt.change != go.ChangedEvent.Remove;
-    toNodeData.connected = isConnected;
-    diagram.model.updateTargetBindings(toNodeData);
-  }
-});
-
-function findNodesByCategory(category) {
-  const nodes = [];
-
-  diagram.nodes.each((node) => {
-    if (node.data?.category === category) {
-      nodes.push(node);
-    }
-  });
-
-  return nodes;
-}
-
-const socket = io("http://localhost:3000");
-
-socket.on("message", function (msg) {
-  console.log(msg);
-  diagram.commit(() => {
-    const monitors = findNodesByCategory("monitor");
-    for (const n of monitors) {
-      const d = n.data;
-      if (d.connected) {
-        diagram.model.set(d, "parameters", [
-          {
-            label: "T",
-            value: msg.t,
-            unit: "°C",
-          },
-          {
-            label: "P",
-            value: msg.p,
-            unit: "atm",
-          },
-          {
-            label: "Q",
-            value: msg.q,
-            unit: "m³/s",
-          },
-        ]);
-      } else {
-        diagram.model.set(d, "parameters", [
-          {
-            label: "T",
-            value: "0",
-            unit: "°C",
-          },
-          {
-            label: "P",
-            value: "1",
-            unit: "atm",
-          },
-          {
-            label: "Q",
-            value: "1",
-            unit: "m³/s",
-          },
-        ]);
-      }
-    }
-  }, null);
-});
+sheetManager.diagramControl.trackingLinked();
+sheetManager.diagramControl.trackingReLink()
+sheetManager.diagramControl.syncData()
