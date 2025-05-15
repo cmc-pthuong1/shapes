@@ -1,10 +1,14 @@
-import { colors, defaultPropertiesMonitor } from "../../core/constants/common.js";
+import {
+  colors,
+  defaultPropertiesMonitor,
+} from "../../core/constants/common.js";
 import {
   tank1,
   tank2,
   tank3,
   valve1,
 } from "../../core/constants/geometrics.js";
+import { scadaInspectorInputs } from "../../core/constants/inspector.js";
 import {
   monitorTemplate,
   tankTemplate,
@@ -15,6 +19,7 @@ import { Diagram } from "../../modules/diagram.js";
 import { Palette } from "../../modules/palette.js";
 import { SCADASheet } from "../../modules/scada.js";
 import { Sheet } from "../../modules/sheets.js";
+import { Inspector } from "../../modules/inspector.js";
 
 // Bảng thiết bị: (Thiết bị, Cảm Biến)
 // Bảng dữ liệu đo lường
@@ -41,6 +46,8 @@ const paletteData = [
     color: "gray",
     status: "active",
     geometryString: tank1,
+    width: 100,
+    height: 130,
     ports: [
       {
         p: "BR1",
@@ -68,6 +75,8 @@ const paletteData = [
     type: "tank2",
     name: "MPHE",
     geometryString: tank2,
+    width: 100,
+    height: 130,
     ports: [
       { p: "BL1", a: new go.Spot(0, 0.5), fs: go.Spot.Left, ts: go.Spot.Left },
       {
@@ -96,6 +105,8 @@ const paletteData = [
     type: "tank3",
     name: "MHTW",
     geometryString: tank3,
+    width: 110,
+    height: 130,
     ports: [
       { p: "BL3", a: new go.Spot(0, 0.45), ts: go.Spot.Left, fs: go.Spot.Left },
       { p: "BL2", a: new go.Spot(0, 0.6), ts: go.Spot.Left, fs: go.Spot.Left },
@@ -118,6 +129,8 @@ const paletteData = [
   {
     category: "monitor",
     name: "monitor TVC102",
+    width: 120,
+    height: 70,
     properties: {
       ...defaultPropertiesMonitor,
     },
@@ -126,6 +139,8 @@ const paletteData = [
     category: "valve",
     name: "LCV101",
     geometryString: valve1,
+    width: 60,
+    height: 40,
     ports: { p: "BL1", a: new go.Spot(0, 0.5), ts: go.Spot.Left },
     properties: {
       flowRate: "0",
@@ -185,6 +200,13 @@ diagram.model = new go.GraphLinksModel({
   linkFromPortIdProperty: "fromPort", // required information:
   linkToPortIdProperty: "toPort", // identifies data property names
 });
+
+const inspector = new Inspector({
+  diagram: diagram,
+  inspectorDivId: "inspector",
+  inspectorInputs: scadaInspectorInputs,
+});
+
 sheetManager.diagramControl.trackingLinked();
-sheetManager.diagramControl.trackingReLink()
-sheetManager.diagramControl.syncData()
+sheetManager.diagramControl.trackingReLink();
+sheetManager.diagramControl.syncData();

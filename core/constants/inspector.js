@@ -13,7 +13,7 @@ export const nodeDataKeys = {
   fontStyle: "fontStyle",
   fontWeight: "fontWeight",
   fontSize: "fontSize",
-  fontFamily: "fontFamily"
+  fontFamily: "fontFamily",
 };
 
 export const inspectorInputs = [
@@ -136,6 +136,39 @@ export const inspectorImageInputs = [
   {
     key: nodeDataKeys.width,
     default: 40,
+    type: "number",
+    label: "Width",
+  },
+];
+
+export const scadaInspectorInputs = [
+  {
+    key: "name",
+    default: "Name",
+    type: "text",
+    label: "Name",
+  },
+  {
+    key: "x",
+    default: 0,
+    type: "number",
+    label: "x",
+  },
+  {
+    key: "y",
+    default: 0,
+    type: "number",
+    label: "y",
+  },
+  {
+    key: nodeDataKeys.height,
+    default: 100,
+    type: "number",
+    label: "Height",
+  },
+  {
+    key: nodeDataKeys.width,
+    default: 100,
     type: "number",
     label: "Width",
   },
