@@ -157,6 +157,7 @@ const paletteData = [
     value: "12.0",
     pos: "385 68",
     unit: "°C",
+    ports: { p: "BL2", a: new go.Spot(0, 0.5), ts: go.Spot.Left },
   },
 ];
 
