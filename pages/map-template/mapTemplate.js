@@ -160,28 +160,13 @@ const linkTemplate = new go.Link({
       strokeWidth: 3.5,
       stroke: colors.green,
       isPanelMain: true,
-    }).bind("stroke", "", (data, node) => {
-      if (data.toPort == "monitor") return portColor[data.toPort];
-      return portColor[data.fromPort] || colors.blue;
     }),
     new go.Shape({
       fill: colors.green,
       toArrow: "Triangle",
       scale: 1.4,
       stroke: colors.black,
-    }).bind("stroke", "", (data, node) => {
-      if (data.toPort == "monitor") return portColor[data.toPort];
-      return portColor[data.fromPort] || colors.blue;
     })
-
-    // new go.Shape({ strokeWidth: 4 }).bind(
-    //   "stroke",
-    //   "fromPort",
-    //   (fromPort) => portColor[fromPort] || "black"
-    // ),
-    // new go.Shape({ toArrow: "Standard" })
-    //   .bind("stroke", "fromPort", (fromPort) => portColor[fromPort] || "black")
-    //   .bind("fill", "fromPort", (fromPort) => portColor[fromPort] || "black")
   );
 
 const sheetManager = new SCADASheet({
@@ -196,132 +181,10 @@ window.importJson = (e) => sheetManager.importJson(e);
 
 const diagram = sheetManager.diagram;
 
-const linkDataArray = [
-  { from: "Tank1", to: "Tank2", fromPort: "BR1", toPort: "BL3" },
-  //   { from: "Tank1", to: "Tank2", fromPort: "BR3", toPort: "BL2" },
-];
-
 diagram.model = new go.GraphLinksModel({
   linkFromPortIdProperty: "fromPort", // required information:
   linkToPortIdProperty: "toPort", // identifies data property names
-  linkDataArray: linkDataArray,
 });
-
-function trackingLinked() {
-  diagram.model.addChangedListener(function (evt) {
-    if (evt.propertyName === "linkDataArray") {
-      const deletedLink = evt?.oldValue;
-      const link = evt.newValue;
-      const toKey =
-        evt.change === go.ChangedEvent.Remove ? deletedLink.to : link.to;
-
-      const toNodeData = diagram.model.findNodeDataForKey(toKey);
-      if (toNodeData.category == "monitor") {
-        let isConnected = evt.change != go.ChangedEvent.Remove;
-
-        toNodeData.properties = isConnected
-          ? {
-              ...toNodeData.properties,
-              connected: true,
-            }
-          : defaultPropertiesMonitor;
-        diagram.model.updateTargetBindings(toNodeData);
-        if (isConnected) {
-          //emit registerDevice
-          socket.emit("registerDevice", {
-            deviceId: toNodeData.key,
-            status: "active",
-          });
-        } else {
-          socket.emit("disconnectDevice", {
-            deviceId: toNodeData.key,
-          });
-        }
-      }
-    }
-  });
-}
-
-function trackingReLink() {
-  diagram.addDiagramListener("LinkRelinked", function (e) {
-    const link = e.subject.part;
-    if (link instanceof go.Link) {
-      const newToNode = link.toNode;
-      const isMonitor = newToNode.data?.category == "monitor";
-      if (isMonitor) {
-        console.log(newToNode.data);
-        const properties = { ...newToNode.data, connected: true };
-        diagram.model.setDataProperty(newToNode.data, "properties", properties);
-        // emit registerDevice
-        socket.emit("registerDevice", {
-          deviceId: newToNode.key,
-          statusConnect: true,
-        });
-      }
-    }
-  });
-  const myRelinkingTool = new go.RelinkingTool();
-
-  myRelinkingTool.reconnectLink = function (
-    existingLink,
-    fromNode,
-    fromPort,
-    toNode,
-    toPort,
-    isFrom
-  ) {
-    const oldTo = existingLink.toNode;
-    const isMonitor = oldTo.data?.category == "monitor";
-    if (isMonitor) {
-      console.log(oldTo.data);
-      diagram.model.setDataProperty(oldTo.data, "properties", defaultPropertiesMonitor);
-      //emit disconnectDevice
-      socket.emit("disconnectDevice", {
-        deviceId: oldTo.key,
-      });
-    }
-
-    go.RelinkingTool.prototype.reconnectLink.call(
-      this,
-      existingLink,
-      fromNode,
-      fromPort,
-      toNode,
-      toPort,
-      isFrom
-    );
-  };
-  diagram.toolManager.relinkingTool = myRelinkingTool;
-}
-
-trackingLinked();
-trackingReLink();
-function findNodesByCategory(category) {
-  const nodes = [];
-
-  diagram.nodes.each((node) => {
-    if (node.data?.category === category) {
-      nodes.push(node);
-    }
-  });
-
-  return nodes;
-}
-
-const socket = io("http://localhost:3000");
-socket.on("event", function (msg) {
-  console.log("🚀 ~ msg:", msg)
-  if (msg.event == "pushData") {
-    const key = msg.deviceId;
-    if (!key) return;
-    const toNodeData = diagram.model.findNodeDataForKey(Number(key));
-    if (!toNodeData) return;
-
-    const properties = {
-      ...toNodeData.properties,
-      flowRate: msg.flowRate,
-      pressure: msg.pressure,
-    };
-    diagram.model.set(toNodeData, "properties", properties);
-  }
-});
+sheetManager.diagramControl.trackingLinked();
+sheetManager.diagramControl.trackingReLink()
+sheetManager.diagramControl.syncData()

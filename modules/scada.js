@@ -1,6 +1,7 @@
 import { Diagram } from "./diagram.js";
 import { ImageInserter } from "./imageInserter.js";
 import { Inspector } from "./inspector.js";
+import { SCADADiagram } from "./scadaDiagram.js";
 
 export class SCADASheet {
   constructor({
@@ -19,6 +20,7 @@ export class SCADASheet {
     this.currentSheet = null;
     this.sheetCount = 0;
     this.diagram = null;
+    this.diagramControl = null;
     this.sheetList = null;
     this.inspector = null;
     this.initUI();
@@ -94,13 +96,14 @@ export class SCADASheet {
   }
 
   innitDiagram({ model = null, position = null }) {
-    const newDiagramControl = new Diagram({
+    const newDiagramControl = new SCADADiagram({
       diagramDivId: this.diagramContainerId,
       jsonModel: model,
       nodeTemplate: this.nodeTemplate,
       nodeTemplateMap: this.nodeTemplateMap,
       linkTemplate: this.linkTemplate,
     });
+    this.diagramControl = newDiagramControl
     const newDiagram = newDiagramControl.diagram;
     if (position) {
       newDiagram.addDiagramListener("InitialLayoutCompleted", () => {
@@ -138,7 +141,7 @@ export class SCADASheet {
     }
 
     const jsonData = JSON.stringify(dataSubmit);
-    console.log("🚀 ~ SCADASheet ~ exportAllJson ~ jsonData:", jsonData)
+    console.log("🚀 ~ SCADASheet ~ exportAllJson ~ jsonData:", jsonData);
     const blob = new Blob([jsonData], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
