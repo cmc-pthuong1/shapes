@@ -4,11 +4,14 @@ import {
   tank2,
   tank3,
   valve1,
+  pump,
 } from "../../core/constants/geometrics.js";
 import {
   monitorTemplate,
   tankTemplate,
   valveTemplate,
+  pumpTemplate,
+  sensorTemplate,
 } from "../../core/constants/scadaNodeTemplate.js";
 import { toHeight, toWidth } from "../../core/utils/common.js";
 import { Diagram } from "../../modules/diagram.js";
@@ -31,6 +34,8 @@ const nodeTemplateMap = {
   tank: tankTemplate,
   monitor: monitorTemplate,
   valve: valveTemplate,
+  pump: pumpTemplate,
+  sensor: sensorTemplate,
 };
 
 const paletteData = [
@@ -132,6 +137,25 @@ const paletteData = [
       pressure: "1",
       isOpen: 0,
     },
+  },
+  // PUMPS
+  {
+    category: "pump",
+    name: "P102",
+    geometryString: pump,
+    color: colors.pink,
+    pos: "720 605.3",
+    angle: 180,
+    ports: { p: "BL1", a: new go.Spot(0, 0.5), ts: go.Spot.Left },
+  },
+  // SENSORS:
+  {
+    name: "S1",
+    category: "sensor",
+    value: "12.0",
+    pos: "385 68",
+    unit: "°C",
+    ports: { p: "BL2", a: new go.Spot(0, 0.5), ts: go.Spot.Left },
   },
 ];
 

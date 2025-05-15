@@ -1,6 +1,7 @@
 import { toHeight, toWidth } from "../utils/common.js";
 import { colors } from "./common.js";
-import { tank1, valve1 } from "./geometrics.js";
+import { tank1, valve1, pump, sensor } from "./geometrics.js";
+import { textDefaults } from "./common.js";
 
 export const tankPort = new go.Panel({
   fromLinkable: true,
@@ -161,3 +162,74 @@ export const valveTemplate = new go.Node("Spot", {
     stroke: colors.transparent,
   })
 );
+
+export const pumpTemplate = new go.Node("Vertical", {
+  locationSpot: new go.Spot(0.5, 1, 0, -21),
+  locationObjectName: "SHAPE",
+  selectionObjectName: "SHAPE",
+  rotatable: true,
+})
+  .bindTwoWay("angle")
+  .bindTwoWay("location", "pos", go.Point.parse, go.Point.stringify)
+  .add(
+    new go.TextBlock({
+      background: colors.black,
+      alignment: go.Spot.Center,
+      textAlign: "center",
+      margin: 2,
+      editable: true,
+    })
+      .set(textDefaults)
+      .bind("text", "name")
+      // keep the text upright, even when the whole node has been rotated upside down
+      .bindObject("angle", "angle", (a) => (a === 180 ? 180 : 0)),
+    new go.Shape({
+      name: "SHAPE",
+      geometryString: pump,
+      width: 45,
+      height: 40,
+      toLinkable: true,
+      fromLinkable: true,
+      strokeWidth: 2,
+      portId: "",
+      fromSpot: new go.Spot(1, 0.25),
+      toSpot: new go.Spot(0, 0.5),
+    })
+      .bind("fill", "color")
+      .bind("stroke", "color", (c) => Brush.darkenBy(c, 0.3))
+  );
+
+export const sensorTemplate = new go.Node("Vertical", {
+  background: colors.black,
+})
+  .bindTwoWay("location", "pos", go.Point.parse, go.Point.stringify)
+  .add(
+    new go.Panel("Horizontal", { margin: 4 }).add(
+      new go.Shape({
+        fill: colors.black,
+        stroke: colors.white,
+        strokeWidth: 2,
+        geometryString: sensor,
+        toLinkable: true,
+        fromLinkable: true,
+        portId: "",
+        fromSpot: new go.Spot(0, 0.4, 0, 0),
+      }),
+      new go.TextBlock({ margin: 2 }).set(textDefaults).bind("text", "name")
+    ),
+    new go.Panel("Horizontal").add(
+      new go.Panel("Spot", { column: 1 }).add(
+        new go.Shape({
+          stroke: colors.orange,
+          fill: colors.black,
+          margin: 2,
+          width: 40,
+          height: 15,
+        }),
+        new go.TextBlock("", {}).set(textDefaults).bind("text", "value")
+      ),
+      new go.TextBlock("", { column: 2, alignment: go.Spot.Left })
+        .set(textDefaults)
+        .bind("text", "unit")
+    )
+  );
