@@ -13,11 +13,8 @@ import {
   pumpTemplate,
   sensorTemplate,
 } from "../../core/constants/scadaNodeTemplate.js";
-import { toHeight, toWidth } from "../../core/utils/common.js";
-import { Diagram } from "../../modules/diagram.js";
 import { Palette } from "../../modules/palette.js";
 import { SCADASheet } from "../../modules/scada.js";
-import { Sheet } from "../../modules/sheets.js";
 
 // Bảng thiết bị: (Thiết bị, Cảm Biến)
 // Bảng dữ liệu đo lường
@@ -202,13 +199,3 @@ const sheetManager = new SCADASheet({
 
 window.exportAllJson = () => sheetManager.exportAllJson();
 window.importJson = (e) => sheetManager.importJson(e);
-
-const diagram = sheetManager.diagram;
-
-diagram.model = new go.GraphLinksModel({
-  linkFromPortIdProperty: "fromPort", // required information:
-  linkToPortIdProperty: "toPort", // identifies data property names
-});
-sheetManager.diagramControl.trackingLinked();
-sheetManager.diagramControl.trackingReLink()
-sheetManager.diagramControl.syncData()

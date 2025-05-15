@@ -1,6 +1,3 @@
-import { Diagram } from "./diagram.js";
-import { ImageInserter } from "./imageInserter.js";
-import { Inspector } from "./inspector.js";
 import { SCADADiagram } from "./scadaDiagram.js";
 
 export class SCADASheet {
@@ -59,58 +56,42 @@ export class SCADASheet {
       };
     }
 
-    // Hủy liên kết Diagram cũ trước khi tạo mới
-    if (this.diagram) {
-      this.diagram.div = null; // Bắt buộc để GoJS hủy liên kết với div
-      this.diagram.clear(); // Giải phóng tài nguyên
-      this.diagram = null;
-    }
-
     // Cập nhật sheet hiện tại
     this.currentSheet = sheetName;
 
     // Tạo Diagram mới
-    const newDiagram = this.innitDiagram({
+    this.innitDiagram({
       model: this.sheetModels?.[sheetName] || {},
     });
-
-    this.diagram = newDiagram;
-    // this.diagram.commandHandler.groupSelection();
-
-    // // Tạo lại inspector
-    // this.inspector = new Inspector({
-    //   diagram: this.diagram,
-    //   inspectorDivId: "inspector",
-    // });
-    // // tạo insert image
-    // const imageInserter = new ImageInserter({
-    //   diagram: this.diagram,
-    //   imageInserterDivId: "imageInserter",
-    // });
-    // // bật chức năng insert ảnh
-    // imageInserter.initUI();
-    // imageInserter.enableDocumentPasteImage();
-    // imageInserter.enableImageDropEvent();
 
     this.highlightActiveSheet(sheetName);
   }
 
   innitDiagram({ model = null, position = null }) {
-    const newDiagramControl = new SCADADiagram({
-      diagramDivId: this.diagramContainerId,
-      jsonModel: model,
-      nodeTemplate: this.nodeTemplate,
-      nodeTemplateMap: this.nodeTemplateMap,
-      linkTemplate: this.linkTemplate,
-    });
-    this.diagramControl = newDiagramControl
-    const newDiagram = newDiagramControl.diagram;
-    if (position) {
-      newDiagram.addDiagramListener("InitialLayoutCompleted", () => {
-        newDiagram.position = go.Point.parse(position);
+    if (!this.diagramControl) {
+      const newDiagramControl = new SCADADiagram({
+        diagramDivId: this.diagramContainerId,
+        jsonModel: model,
+        nodeTemplate: this.nodeTemplate,
+        nodeTemplateMap: this.nodeTemplateMap,
+        linkTemplate: this.linkTemplate,
       });
+      this.diagramControl = newDiagramControl
+      this.diagram = newDiagramControl.diagram;
+    }else{
+      const newDiagram = this.diagramControl.remapDiagram({
+        model: model,
+        position: position,
+      });
+      this.diagram = newDiagram;
     }
-    return newDiagram;
+
+    // if (position) {
+    //   newDiagram.addDiagramListener("InitialLayoutCompleted", () => {
+    //     newDiagram.position = go.Point.parse(position);
+    //   });
+    // }
+    // return newDiagram;
   }
 
   highlightActiveSheet(name) {
@@ -212,5 +193,3 @@ export class SCADASheet {
     return this.sheetModels;
   }
 }
-
-// C:\DATA-PTHUONG1\DKR\shapes\pages\map-template

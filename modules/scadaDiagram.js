@@ -1,3 +1,4 @@
+import { defaultPropertiesMonitor } from "../core/constants/common.js";
 import { ImageTemplate, linkTemplate } from "../core/constants/nodeTemplate.js";
 
 export class SCADADiagram {
@@ -50,8 +51,13 @@ export class SCADADiagram {
         linkToPortIdProperty: "toPort", // identifies data property names
       });
     }
+    console.log("initDiagram");
+    this.trackingLinked();
+    this.trackingReLink();
+    this.syncData();
   }
   trackingLinked() {
+    console.log("trackingLinked");
     const _ = this;
     _.diagram.model.addChangedListener(function (evt) {
       if (evt.propertyName === "linkDataArray") {
@@ -88,6 +94,7 @@ export class SCADADiagram {
   }
 
   trackingReLink() {
+    console.log("trackingReLink");
     const _ = this;
     _.diagram.addDiagramListener("LinkRelinked", function (e) {
       const link = e.subject.part;
@@ -163,5 +170,36 @@ export class SCADADiagram {
         _.diagram.model.set(toNodeData, "properties", properties);
       }
     });
+  }
+  remapDiagram({ model = null, position = null }) {
+    console.log("remapDiagram");
+    // Hủy liên kết Diagram cũ trước khi tạo mới
+    this.disconnectDiagram();
+    if (this.diagram) {
+      this.diagram.div = null; // Bắt buộc để GoJS hủy liên kết với div
+      this.diagram.clear(); // Giải phóng tài nguyên
+      this.diagram = null;
+    }
+    this.jsonModel = model;
+    this.initDiagram();
+    this.reconnectNodeToSocket()
+    return this.diagram;
+  }
+  reconnectNodeToSocket() {
+    console.log("reconnectNodeToSocket");
+    const _ = this;
+    _.diagram.model.nodeDataArray.forEach((node) => {
+      if (node.category == "monitor") {
+        _.socket.emit("registerDevice", {
+          deviceId: node.key,
+          status: "active",
+        });
+      }
+    });
+  }
+
+  disconnectDiagram() {
+    console.log("disconnectDiagram");
+    this.socket.emit("disconnectDiagram");
   }
 }
