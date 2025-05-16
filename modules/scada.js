@@ -199,6 +199,8 @@ export class SCADASheet {
         position: "0 0",
       };
     }
+    console.log(" data", data);
+
     this.sheetModels = data;
 
     this.currentSheet = null;

@@ -28,7 +28,12 @@
     <div class="bottomBar">
       <div class="sheets" id="sheetListContainer"></div>
       <div class="right-actions">
-        <input type="file" id="fileJsonInput" onchange="importJson(event)" />
+        <input
+          type="file"
+          id="fileJsonInput"
+          class="inputfile"
+          onchange="importJson(event)"
+        />
         <button class="export-btn" onclick="exportAllJson()">Export</button>
       </div>
     </div>

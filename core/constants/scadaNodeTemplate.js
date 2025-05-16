@@ -25,12 +25,7 @@ export const tankTemplate = new go.Node("Spot", {
   resizeObjectName: "Main",
 })
   .bind("itemArray", "ports")
-  .bindTwoWay(
-    "location",
-    "",
-    toLocation, // binding
-    fromLocation //make two way
-  )
+  .bindTwoWay("location", "pos", go.Point.parse, go.Point.stringify)
   .add(
     new go.Panel("Spot", {
       strokeWidth: 2,
@@ -66,12 +61,7 @@ export const monitorTemplate = new go.Node("Auto", {
   resizable: true,
   minSize: new go.Size(100, 40),
 })
-  .bindTwoWay(
-    "location",
-    "",
-    toLocation, // binding
-    fromLocation //make two way
-  )
+  .bindTwoWay("location", "pos", go.Point.parse, go.Point.stringify)
   .bindTwoWay("width")
   .bindTwoWay("height")
   .add(
@@ -146,12 +136,7 @@ export const valveTemplate = new go.Node("Vertical", {
   resizeObjectName: "Main",
   rotateObjectName: "Main",
 })
-  .bindTwoWay(
-    "location",
-    "",
-    toLocation, // binding
-    fromLocation //make two way
-  )
+  .bindTwoWay("location", "pos", go.Point.parse, go.Point.stringify)
   .bind("width")
   .bind("height", "", (data) => data.height + 13)
   .add(
