@@ -81,7 +81,7 @@ export class SCADASheet {
 
     // Tạo Diagram mới
     this.innitDiagram({
-      model: this.sheetModels?.[sheetName]?.model || {},
+      model: this.sheetModels?.[sheetName]?.model || null,
       position: this.sheetModels?.[sheetName]?.position || "0 0",
     });
 
