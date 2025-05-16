@@ -1,7 +1,7 @@
 import {
-  inspectorImageInputs,
+  inspectorImageInputs as defaultInspectorImageInputs,
   nodeDataKeys,
-  inspectorInputs,
+  inspectorInputs as defaultInspectorInputs,
 } from "../core/constants/inspector.js";
 import {
   convertAlignmentToValue,
@@ -9,10 +9,17 @@ import {
 } from "../core/utils/inspector.js";
 
 export class Inspector {
-  constructor({ inspectorDivId, diagram }) {
+  constructor({
+    inspectorDivId,
+    diagram,
+    inspectorInputs = defaultInspectorInputs,
+    inspectorImageInputs = defaultInspectorImageInputs,
+  }) {
     this.inspectorDivId = inspectorDivId;
     this.diagram = diagram;
     this.inspectorContainer = document.getElementById(inspectorDivId);
+    this.inspectorInputs = inspectorInputs;
+    this.inspectorImageInputs = inspectorImageInputs;
     this.changedSelection();
     this.onModelChange();
   }
@@ -23,9 +30,9 @@ export class Inspector {
       if (part instanceof go.Node) {
         const data = part.data;
         if (data.category == "ImageNode") {
-          this.initUI(data, inspectorImageInputs);
+          this.initUI(data, this.inspectorImageInputs);
         } else {
-          this.initUI(data, inspectorInputs);
+          this.initUI(data, this.inspectorInputs);
         }
       }
     });
