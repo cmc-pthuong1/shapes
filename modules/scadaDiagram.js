@@ -178,7 +178,6 @@ export class SCADADiagram {
     if (this.diagram) {
       this.diagram.div = null; // Bắt buộc để GoJS hủy liên kết với div
       this.diagram.clear(); // Giải phóng tài nguyên
-      this.diagram = null;
     }
     this.jsonModel = model;
     this.initDiagram();
