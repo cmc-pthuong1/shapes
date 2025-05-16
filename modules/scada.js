@@ -1,4 +1,6 @@
 import { SCADADiagram } from "./scadaDiagram.js";
+import { Inspector } from "./inspector.js";
+import { scadaInspectorInputs } from "../core/constants/inspector.js";
 
 export class SCADASheet {
   constructor({
@@ -84,6 +86,8 @@ export class SCADASheet {
     });
 
     this.highlightActiveSheet(sheetName);
+    // khởi tạo inspector:
+    this.initInspector();
   }
 
   innitDiagram({ model = null, position = null }) {
@@ -111,6 +115,14 @@ export class SCADASheet {
     //   });
     // }
     // return newDiagram;
+  }
+
+  initInspector() {
+    this.inspector = new Inspector({
+      diagram: this.diagram,
+      inspectorDivId: "inspector",
+      inspectorInputs: scadaInspectorInputs,
+    });
   }
 
   highlightActiveSheet(name) {
