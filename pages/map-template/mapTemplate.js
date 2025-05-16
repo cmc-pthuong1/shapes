@@ -206,7 +206,7 @@ const linkTemplate = new go.Link({
 
 const sheetManager = new SCADASheet({
   diagramContainerId: "diagram",
-  sheetListContainerId: "sheetList",
+  sheetListContainerId: "sheetListContainer",
   nodeTemplateMap: nodeTemplateMap,
   linkTemplate: linkTemplate,
 });

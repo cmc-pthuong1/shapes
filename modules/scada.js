@@ -47,6 +47,24 @@ export class SCADASheet {
     this.switchSheet(sheetName);
   }
 
+  remapSheetList(sheetList) {
+    const sheetListDiv = document.getElementById("sheetList");
+    sheetListDiv.innerHTML = "";
+
+    const sheetNames = Object.keys(sheetList);
+    sheetNames.forEach((sheetName, index) => {
+      const btn = document.createElement("button");
+      btn.textContent = sheetName;
+      btn.id = `btn-${sheetName}`;
+      btn.style.backgroundColor = index === 0 ? "#b3d4fc" : "";
+      btn.onclick = () => this.switchSheet(sheetName);
+      sheetListDiv.appendChild(btn);
+    });
+
+    this.sheetCount = sheetNames.length;
+    this.switchSheet(sheetNames[0]);
+  }
+
   switchSheet(sheetName) {
     // Lưu sơ đồ hiện tại
     if (this.diagram && this.currentSheet) {
@@ -61,7 +79,8 @@ export class SCADASheet {
 
     // Tạo Diagram mới
     this.innitDiagram({
-      model: this.sheetModels?.[sheetName] || {},
+      model: this.sheetModels?.[sheetName]?.model || {},
+      position: this.sheetModels?.[sheetName]?.position || "0 0",
     });
 
     this.highlightActiveSheet(sheetName);
@@ -76,9 +95,9 @@ export class SCADASheet {
         nodeTemplateMap: this.nodeTemplateMap,
         linkTemplate: this.linkTemplate,
       });
-      this.diagramControl = newDiagramControl
+      this.diagramControl = newDiagramControl;
       this.diagram = newDiagramControl.diagram;
-    }else{
+    } else {
       const newDiagram = this.diagramControl.remapDiagram({
         model: model,
         position: position,
@@ -137,6 +156,7 @@ export class SCADASheet {
     const input = event.target;
     if (input.files.length > 0) {
       const file = input.files[0];
+      input.value = "";
 
       // Kiểm tra xem file có phải là JSON không
       if (file.type !== "application/json") {
@@ -168,19 +188,21 @@ export class SCADASheet {
   convertDataToSheet(jsonData) {
     const data = {};
     for (const sheet in jsonData) {
-      data[sheet] = JSON.stringify({
-        class: "GraphLinksModel",
-        linkFromPortIdProperty: "fromPort",
-        linkToPortIdProperty: "toPort",
-        nodeDataArray: jsonData[sheet].devices,
-        linkDataArray: jsonData[sheet].connections,
-      });
+      data[sheet] = {
+        model: JSON.stringify({
+          class: "GraphLinksModel",
+          linkFromPortIdProperty: "fromPort",
+          linkToPortIdProperty: "toPort",
+          nodeDataArray: jsonData[sheet].devices,
+          linkDataArray: jsonData[sheet].connections,
+        }),
+        position: "0 0",
+      };
     }
     this.sheetModels = data;
 
     this.currentSheet = null;
-
-    this.switchSheet(Object.keys(jsonData)[0]);
+    this.remapSheetList(data);
   }
 
   getCurrentDiagram() {
