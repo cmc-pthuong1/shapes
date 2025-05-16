@@ -12,6 +12,11 @@ export const colors = {
   transparent: "transparent",
 };
 
+export const textDefaults = {
+  font: "10px InterVariable, sans-serif",
+  stroke: colors.white,
+};
+
 export const defaultPropertiesMonitor = {
   flowRate: "0",
   pressure: "1",
