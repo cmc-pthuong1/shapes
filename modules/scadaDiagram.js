@@ -67,27 +67,10 @@ export class SCADADiagram {
           evt.change === go.ChangedEvent.Remove ? deletedLink.to : link.to;
 
         const toNodeData = _.diagram.model.findNodeDataForKey(toKey);
-        if (toNodeData.category == "monitor") {
-          let isConnected = evt.change != go.ChangedEvent.Remove;
+        if (toNodeData && toNodeData.category == "monitor") {
+          const isConnected = evt.change != go.ChangedEvent.Remove;
 
-          toNodeData.properties = isConnected
-            ? {
-                ...toNodeData.properties,
-                connected: true,
-              }
-            : defaultPropertiesMonitor;
-          _.diagram.model.updateTargetBindings(toNodeData);
-          if (isConnected) {
-            //emit registerDevice
-            _.socket.emit("registerDevice", {
-              deviceId: toNodeData.key,
-              status: "active",
-            });
-          } else {
-            _.socket.emit("disconnectDevice", {
-              deviceId: toNodeData.key,
-            });
-          }
+          _.updateNodeConnection(toNodeData, isConnected);
         }
       }
     });
@@ -96,26 +79,17 @@ export class SCADADiagram {
   trackingReLink() {
     console.log("trackingReLink");
     const _ = this;
+    //Link Relinked
     _.diagram.addDiagramListener("LinkRelinked", function (e) {
       const link = e.subject.part;
       if (link instanceof go.Link) {
         const newToNode = link.toNode;
-        const isMonitor = newToNode.data?.category == "monitor";
-        if (isMonitor) {
-          const properties = { ...newToNode.data, connected: true };
-          _.diagram.model.setDataProperty(
-            newToNode.data,
-            "properties",
-            properties
-          );
-          // emit registerDevice
-          _.socket.emit("registerDevice", {
-            deviceId: newToNode.key,
-            statusConnect: true,
-          });
+        if (newToNode && newToNode.data?.category === "monitor") {
+          _.updateNodeConnection(newToNode.data, true);
         }
       }
     });
+    //Link Relinking
     const myRelinkingTool = new go.RelinkingTool();
 
     myRelinkingTool.reconnectLink = function (
@@ -127,18 +101,8 @@ export class SCADADiagram {
       isFrom
     ) {
       const oldTo = existingLink.toNode;
-      const isMonitor = oldTo.data?.category == "monitor";
-      if (isMonitor) {
-        console.log(oldTo.data);
-        _.diagram.model.setDataProperty(
-          oldTo.data,
-          "properties",
-          defaultPropertiesMonitor
-        );
-        //emit disconnectDevice
-        _.socket.emit("disconnectDevice", {
-          deviceId: oldTo.key,
-        });
+      if (oldTo && oldTo.data?.category === "monitor") {
+        _.updateNodeConnection(oldTo.data, false);
       }
 
       go.RelinkingTool.prototype.reconnectLink.call(
@@ -153,6 +117,22 @@ export class SCADADiagram {
     };
     _.diagram.toolManager.relinkingTool = myRelinkingTool;
   }
+
+  updateNodeConnection(nodeData, isConnected) {
+    const _ = this;
+    nodeData.properties = isConnected
+      ? { ...nodeData.properties, connected: true }
+      : defaultPropertiesMonitor;
+
+    _.diagram.model.updateTargetBindings(nodeData);
+
+    const action = isConnected ? "registerDevice" : "disconnectDevice";
+    _.socket.emit(action, {
+      deviceId: nodeData.key,
+      status: isConnected ? "active" : undefined,
+    });
+  }
+
   syncData() {
     const _ = this;
     _.socket.on("event", function (msg) {
@@ -181,7 +161,7 @@ export class SCADADiagram {
     }
     this.jsonModel = model;
     this.initDiagram();
-    this.reconnectNodeToSocket()
+    this.reconnectNodeToSocket();
     return this.diagram;
   }
   reconnectNodeToSocket() {
