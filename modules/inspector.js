@@ -95,10 +95,8 @@ export class Inspector {
 
     this.diagram.addModelChangedListener((evt) => {
       // ignore unimportant Transaction events
-      if (!evt.isTransactionFinished) return;
       const txn = evt.object; // a Transaction
-
-      if (txn === null) return;
+      if (!evt.isTransactionFinished || txn === null) return;
 
       // iterate over all of the actual ChangedEvents of the Transaction
       txn.changes.each((e) => {
