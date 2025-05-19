@@ -201,10 +201,10 @@ export const valveTemplate = new go.Node("Vertical", {
   );
 
 export const pumpTemplate = new go.Node("Vertical", {
-  locationSpot: new go.Spot(0.5, 1, 0, -21),
-  locationObjectName: "SHAPE",
-  selectionObjectName: "SHAPE",
+  resizable: true,
   rotatable: true,
+  resizeObjectName: "SHAPE",
+  rotateObjectName: "SHAPE",
 })
   .bindTwoWay("angle")
   .bindTwoWay("location", "pos", go.Point.parse, go.Point.stringify)
@@ -228,21 +228,40 @@ export const pumpTemplate = new go.Node("Vertical", {
       toLinkable: true,
       fromLinkable: true,
       strokeWidth: 2,
-      portId: "",
-      fromSpot: new go.Spot(1, 0.25),
-      toSpot: new go.Spot(0, 0.5),
     })
       .bind("fill", "color")
-      .bind("stroke", "color", (c) => Brush.darkenBy(c, 0.3))
+      .bind("stroke", "color", (c) => Brush.darkenBy(c, 0.3)),
+    new go.Shape("Circle", {
+      portId: "pump-input",
+      toLinkable: true,
+      with: 5,
+      height: 5,
+      alignment: new go.Spot(0.9, 0, 0, -35),
+      fill: colors.transparent,
+      stroke: colors.transparent,
+    }),
+    new go.Shape("Circle", {
+      portId: "pump-output",
+      fromLinkable: true,
+      with: 5,
+      height: 5,
+      alignment: new go.Spot(0, 0, 0, -35),
+      fill: colors.transparent,
+      stroke: colors.transparent,
+    })
   );
 
 export const sensorTemplate = new go.Node("Vertical", {
   background: colors.black,
+  resizeObjectName: "SHAPE",
+  rotateObjectName: "SHAPE",
 })
   .bindTwoWay("location", "pos", go.Point.parse, go.Point.stringify)
   .add(
     new go.Panel("Horizontal", { margin: 4 }).add(
       new go.Shape({
+        name: "SHAPE",
+
         fill: colors.black,
         stroke: colors.white,
         strokeWidth: 2,
@@ -265,6 +284,24 @@ export const sensorTemplate = new go.Node("Vertical", {
         }),
         new go.TextBlock("", {}).set(textDefaults).bind("text", "value")
       ),
+      new go.Shape("Circle", {
+        portId: "pump-input",
+        toLinkable: true,
+        with: 5,
+        height: 5,
+        alignment: new go.Spot(0, 0, -45, 0),
+        fill: colors.transparent,
+        stroke: colors.transparent,
+      }),
+      new go.Shape("Circle", {
+        portId: "pump-output",
+        fromLinkable: true,
+        with: 10,
+        height: 10,
+        alignment: new go.Spot(0, 0, 10, -8),
+        fill: colors.transparent,
+        stroke: colors.transparent,
+      }),
       new go.TextBlock("", { column: 2, alignment: go.Spot.Left })
         .set(textDefaults)
         .bind("text", "unit")
