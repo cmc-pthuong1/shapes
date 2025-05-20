@@ -237,7 +237,7 @@ export const pumpTemplate = new go.Node("Vertical", {
       with: 5,
       height: 5,
       alignment: new go.Spot(0.9, 0, 0, -35),
-      fill: colors.transparent,
+      fill: colors.yellow,
       stroke: colors.transparent,
     }),
     new go.Shape("Circle", {
@@ -245,8 +245,17 @@ export const pumpTemplate = new go.Node("Vertical", {
       fromLinkable: true,
       with: 5,
       height: 5,
-      alignment: new go.Spot(0, 0, 0, -35),
-      fill: colors.transparent,
+      alignment: new go.Spot(0, 0, 0, -15),
+      fill: colors.red,
+      stroke: colors.transparent,
+    }),
+    new go.Shape("Circle", {
+      portId: "pump-input1",
+      toLinkable: true,
+      with: 5,
+      height: 5,
+      alignment: new go.Spot(0, 0, 0, -45),
+      fill: colors.yellow,
       stroke: colors.transparent,
     })
   );
@@ -273,6 +282,33 @@ export const sensorTemplate = new go.Node("Vertical", {
       }),
       new go.TextBlock({ margin: 2 }).set(textDefaults).bind("text", "name")
     ),
+    new go.Shape("Circle", {
+      portId: "sensor-input",
+      toLinkable: true,
+      with: 5,
+      height: 5,
+      alignment: new go.Spot(0, 0, 1, 0),
+      fill: colors.transparent,
+      stroke: colors.transparent,
+    }),
+    new go.Shape("Circle", {
+      portId: "sensor-output",
+      fromLinkable: true,
+      with: 10,
+      height: 10,
+      alignment: new go.Spot(0, 0, 50, -15),
+      fill: colors.transparent,
+      stroke: colors.transparent,
+    }),
+    new go.Shape("Circle", {
+      portId: "sensor-input2",
+      toLinkable: true,
+      with: 10,
+      height: 10,
+      alignment: new go.Spot(0, 0, 50, 0),
+      fill: colors.transparent,
+      stroke: colors.transparent,
+    }),
     new go.Panel("Horizontal").add(
       new go.Panel("Spot", { column: 1 }).add(
         new go.Shape({
@@ -284,24 +320,7 @@ export const sensorTemplate = new go.Node("Vertical", {
         }),
         new go.TextBlock("", {}).set(textDefaults).bind("text", "value")
       ),
-      new go.Shape("Circle", {
-        portId: "pump-input",
-        toLinkable: true,
-        with: 5,
-        height: 5,
-        alignment: new go.Spot(0, 0, -45, 0),
-        fill: colors.transparent,
-        stroke: colors.transparent,
-      }),
-      new go.Shape("Circle", {
-        portId: "pump-output",
-        fromLinkable: true,
-        with: 10,
-        height: 10,
-        alignment: new go.Spot(0, 0, 10, -8),
-        fill: colors.transparent,
-        stroke: colors.transparent,
-      }),
+
       new go.TextBlock("", { column: 2, alignment: go.Spot.Left })
         .set(textDefaults)
         .bind("text", "unit")
